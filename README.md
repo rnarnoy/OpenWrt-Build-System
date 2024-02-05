@@ -27,8 +27,8 @@ Openvpn
    
 
 
-## >>>[![Manually with SSH](https://github.com/lmxslpc/openwrt-build/actions/workflows/Manually%20with%20SSH.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/lmxslpc/openwrt-build/actions/workflows/Manually%20with%20SSH.yml)<<<
-#####  可用于修改编译内容或手动编译,不同项目请自行修改[环境变量](https://github.com/lmxslpc/openwrt-build?tab=readme-ov-file#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AF%B4%E6%98%8E)
+## >>>[![Manually with SSH](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml)<<<
+#####  可用于修改编译内容或手动编译,不同项目请自行修改[环境变量](https://github.com/lmxslpc/OpenWrt-Build-System?tab=readme-ov-file#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AF%B4%E6%98%8E)
   
    
 
