@@ -42,9 +42,10 @@ Openvpn
 env:
   SSH_DEBUG: 'false'  #false修改为true
 ```
+##### 可选项
 ```
-SSH_TIME    设置开始编译前暂停时间,可用pkill sleep命令提前继续工作流
-SSH_TIME2  设置编译报错后暂停时间,可用pkill sleep命令提前继续工作流
+SSH_TIME    设置开始编译前暂停时间,单位分钟,可用pkill sleep命令提前继续工作流
+SSH_TIME2  设置编译报错后暂停时间,单位分钟,可用pkill sleep命令提前继续工作流
 ```
    
    
@@ -97,8 +98,8 @@ local_ip = 127.0.0.1
 local_port = 22
 remote_port = 22222   
 ```
-##### 备选公共服务器frp1.freefrp.net;frp2.freefrp.net;www.freefrps.com
-##### 若使用公共服务器只需要修改frpc.ini.example中[common]部分的内容
+##### `备选公共服务器frp1.freefrp.net;frp2.freefrp.net;www.freefrps.com`
+##### 若使用公共服务器只需要修改frpc.ini.example中  [common]  部分的内容
    
 
 ---

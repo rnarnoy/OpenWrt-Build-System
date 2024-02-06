@@ -10,7 +10,7 @@ env:
   REPO_URL: 'https://github.com/immortalwrt/immortalwrt'   #项目地址
   REPO_BRANCH: 'openwrt-23.05'   #项目分支
   TARGET_PLATFORM: 'amd64'  #平台架构(amd64/arm64)
-  SSH_DEBUG: 'false' #是否开启ssh功能(true/false)
+  SSH_DEBUG: 'false' #是否开启SSH功能(true/false)
   SSH_TIME: '30'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
   SSH_TIME2: '340'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
   CACHE_CCACHE: 'false'    #是否开启ccache功能(true/false)
@@ -210,7 +210,7 @@ jobs:
       working-directory: ./${{ env.BD_PROJECT }}
       run: |
         echo -e "$(nproc) thread build."
-        make -j$(nproc) || make -j1 || make -j1 V=s | tee build.log
+        make -j$(nproc) || make -j1 V=s | tee build.log
         df -h     
 
     - name: Check compile
