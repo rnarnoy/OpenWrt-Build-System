@@ -36,7 +36,7 @@ Openvpn
 ---
 # 如何使用SSH连接Action
 
-#### 开启ssh调试功能
+#### 开启SSH调试功能
 修改.github/workflows/xxx.yml
 ```
 env:
@@ -49,9 +49,9 @@ SSH_TIME2  设置编译报错后暂停时间,可用pkill sleep命令提前继续
    
    
 ---
-#### ssh连接命令
+#### SSH连接命令
 
-在工作流的setup ssh for debug步骤中会显示
+在工作流的Setup ssh for debug步骤中会显示
 ```
 ============frpc启动成功!===========
 ==========以下是SSH连接命令==========
@@ -122,7 +122,7 @@ remote_port = 22222
 | REPO_URL| 项目地址|
 | REPO_BRANCH|  项目分支|
 | TARGET_PLATFORM|  平台架构(amd64/arm64)|
-| SSH_DEBUG| 是否开启ssh功能(true/false)|
+| SSH_DEBUG| 是否开启SSH功能(true/false)|
 | SSH_TIME|    设置开始编译前暂停时间,可用pkill sleep命令提前继续工作流|
 |SSH_TIME2|   设置编译报错后暂停时间,可用pkill sleep命令提前继续工作流|
 | CACHE_CCACHE  |    是否开启ccache缓存功能,不开启则只缓存工具链(true/false)|
