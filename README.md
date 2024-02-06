@@ -1,5 +1,5 @@
 # 默认配置
----
+
 - IP: `10.1.1.254`
 - 用户名: `root`
 - 密码: `无`
@@ -17,10 +17,10 @@ ZeroTier
 Openvpn
 应用中心(iStore)
 ```
----
+
 ---
 # 使用说明
----   
+
 ## Fork 本项目  ==>  Actions  ==>  选择项目  ==>  Run Workflow
 
 ###### ~~没时间弄目前就写了一个lede_x86_64所以暂时没得选~~
@@ -32,10 +32,10 @@ Openvpn
 #####  可用于修改编译内容或手动编译,不同项目请自行修改[环境变量](https://github.com/lmxslpc/OpenWrt-Build-System?tab=readme-ov-file#%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F%E8%AF%B4%E6%98%8E)
   
    
----
+
 ---
 # 如何使用SSH连接Action
----
+
 #### 开启ssh调试功能
 修改.github/workflows/xxx.yml
 ```
@@ -100,11 +100,11 @@ remote_port = 22222
 ##### 备选公共服务器frp1.freefrp.net;frp2.freefrp.net;www.freefrps.com
 ##### 若使用公共服务器只需要修改frpc.ini.example中[common]部分的内容
    
----
+
 ---
 # 添加新项目
    
----
+
 #### 配置文件说明
 | 目录         |         作用        |文件名格式                   |
 | ------------| --------------------| --------------------|
