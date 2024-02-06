@@ -22,7 +22,7 @@ Openvpn
    
 ## Fork 本项目  ==>  Actions  ==>  选择项目  ==>  Run Workflow
 
-###### 没时间弄目前就写了一个lede_x86_64所以暂时没得选
+###### ~~没时间弄目前就写了一个lede_x86_64所以暂时没得选~~
   
    
 
@@ -41,6 +41,7 @@ Openvpn
 env:
   SSH_DEBUG: 'false'  #false修改为true
 ```
+---
 ```
 SSH_TIME    设置开始编译前暂停时间,可用pkill sleep命令提前继续工作流
 SSH_TIME2  设置编译报错后暂停时间,可用pkill sleep命令提前继续工作流
@@ -83,20 +84,21 @@ FRPC_CONFIG  # 用于定义frpc的配置文件,不设置将自动尝试使用公
    
 
 #### FRPC_CONFIG示例
-###### frp.freefrp.net是个公共服务器,所以可能会与他人配置冲突,默认会随机生成端口并尝试连接
+##### frp.freefrp.net是个公共服务器,所以可能会与他人配置冲突,默认会随机生成端口并尝试连接
 ```
 [common]
-server_addr = frp.freefrp.net  #备选frp1.freefrp.net;frp2.freefrp.net
+server_addr = frp.freefrp.net  
 server_port = 7000
 token = freefrp.net
 
-[ssh2action]     #改成不与他人相同的唯一值,随便写就行
+[ssh2action]     
 type = tcp
 local_ip = 127.0.0.1
 local_port = 22
-remote_port = 22222   #改成不与他人相同的唯一值,端口范围10001 - 50000
+remote_port = 22222   
 ```
-   
+##### 备选公共服务器frp1.freefrp.net;frp2.freefrp.net;www.freefrps.com
+##### 若使用公共服务器只需要修改frpc.ini.example中[common]部分的内容
    
 
 # 添加新项目

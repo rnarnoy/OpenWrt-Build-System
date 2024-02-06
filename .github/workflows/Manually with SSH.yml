@@ -66,10 +66,11 @@ jobs:
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
-        sudo mkdir -p -m 777 /mnt/${{ env.BD_PROJECT }}/dl /mnt/${{ env.BD_PROJECT }}/bin /mnt/${{ env.BD_PROJECT }}/staging_dir
+        sudo mkdir -p -m 777 /mnt/${{ env.BD_PROJECT }}/dl /mnt/${{ env.BD_PROJECT }}/bin /mnt/${{ env.BD_PROJECT }}/staging_dir /mnt/${{ env.BD_PROJECT }}/build_dir
         ln -sf /mnt/${{ env.BD_PROJECT }}/dl ${{ env.BD_PROJECT }}/dl
         ln -sf /mnt/${{ env.BD_PROJECT }}/bin ${{ env.BD_PROJECT }}/bin
         ln -sf /mnt/${{ env.BD_PROJECT }}/staging_dir ${{ env.BD_PROJECT }}/staging_dir
+        ln -sf /mnt/${{ env.BD_PROJECT }}/build_dir ${{ env.BD_PROJECT }}/build_dir
 
     - name: Cache
       uses: HiGarfield/cachewrtbuild@main
@@ -84,7 +85,10 @@ jobs:
       run: |
         mv $GITHUB_WORKSPACE/feeds/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }} $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/feeds.conf
         ./scripts/feeds update -a
-        ./scripts/feeds install -a
+        chmod +x $GITHUB_WORKSPACE/customize/*.sh
+        $GITHUB_WORKSPACE/customize/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.sh
+        $GITHUB_WORKSPACE/customize/preset-adguard-core.sh ${{ env.TARGET_PLATFORM }}
+        $GITHUB_WORKSPACE/customize/preset-clash-core.sh ${{ env.TARGET_PLATFORM }}
         ./scripts/feeds install -a
 
     - name: "Configuration Customization - Build_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}"
@@ -205,6 +209,8 @@ jobs:
           echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
           uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
           echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
+          tar -czvf packages.tar.gz packages
+          rm -rf packages
           echo "===========编译成功,准备上传==========="
         else
           echo "BD_COMPILE=failure" >> $GITHUB_ENV
@@ -213,39 +219,39 @@ jobs:
         fi
 
 
-    - name: Upload Firmware To Release
-      if: env.BD_COMPILE == 'success' && env.UPLOAD_RELEASE == 'true'
-      uses: ncipollo/release-action@main
-      with:
-        name: ${{ env.DATE }}_${{ env.Uppercase_String }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
-        allowUpdates: true
-        tag: ${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: ${{ env.FIRMWARE_PATH }}/*
-        body: |
-          ===Firmware ${{ env.Uppercase_String }} for ${{ env.BD_TARGET }}===
-          ### 📒 固件信息
-          - 💻 平台架构: ${{ env.BD_TARGET }}
-          - ⚽ 固件源码: ${{ env.REPO_URL }}
-          - 💝 源码分支: ${{ env.REPO_BRANCH }}
-          - 🚀 内核版本: ${{ env.KERNEL }}
-          - 🌐 默认地址: 10.1.1.254
-          - 🔑 默认密码: 空       
+    # - name: Upload Firmware To Release
+    #   if: env.BD_COMPILE == 'success' && env.UPLOAD_RELEASE == 'true'
+    #   uses: ncipollo/release-action@main
+    #   with:
+    #     name: ${{ env.DATE }}_${{ env.Uppercase_String }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
+    #     allowUpdates: true
+    #     tag: ${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
+    #     token: ${{ secrets.GITHUB_TOKEN }}
+    #     artifacts: ${{ env.FIRMWARE_PATH }}/*
+    #     body: |
+    #       ===Firmware ${{ env.Uppercase_String }} for ${{ env.BD_TARGET }}===
+    #       ### 📒 固件信息
+    #       - 💻 平台架构: ${{ env.BD_TARGET }}
+    #       - ⚽ 固件源码: ${{ env.REPO_URL }}
+    #       - 💝 源码分支: ${{ env.REPO_BRANCH }}
+    #       - 🚀 内核版本: ${{ env.KERNEL }}
+    #       - 🌐 默认地址: 10.1.1.254
+    #       - 🔑 默认密码: 空       
 
-          ### 📒 插件列表:
-          ```
-          ShadowSocksR Plus+
-          PassWall
-          Openclash
-          Netdata
-          Autotimeset
-          AdGuard Home
-          Mosdns
-          DDNS-go
-          ZeroTier
-          Openvpn
-          应用中心(iStore)
-          ```
+    #       ### 📒 插件列表:
+    #       ```
+    #       ShadowSocksR Plus+
+    #       PassWall
+    #       Openclash
+    #       Netdata
+    #       Autotimeset
+    #       AdGuard Home
+    #       Mosdns
+    #       DDNS-go
+    #       ZeroTier
+    #       Openvpn
+    #       应用中心(iStore)
+    #       ```
 
     - name: Organize files
       if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true'
@@ -254,7 +260,7 @@ jobs:
         echo "=============生成文件列表============="
         ls -lh | awk '{print $9, $5}'
         echo "==============清理文件中============="
-        rm -rf packages *kernel.bin *rootfs* *.json *.tar.zst
+        rm -rf *kernel.bin *rootfs* *.json *.tar.zst
         sleep 2
         echo "=============上传文件列表============="
         ls -lh | awk '{print $9, $5}'

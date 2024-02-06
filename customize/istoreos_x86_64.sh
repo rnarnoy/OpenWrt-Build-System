@@ -9,7 +9,7 @@ sed -i 's/192.168.1.1/10.1.1.254/g' ./package/base-files/files/bin/config_genera
 sed -i 's/$1$5mjCdAB1$Uk1sNbwoqfHxUmzRIeuZK1//g' ./package/base-files/files/etc/shadow
 
 #更换插件名称
-#sed -i 's/ShadowSocksR Plus+/科学上网/g' ./package/feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
+#sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
 sed -i 's/("iStore"),/("应用中心"),/g' feeds/store/luci/luci-app-store/luasrc/controller/store.lua
 
 #修改内核版本
@@ -94,4 +94,5 @@ rm -rf feeds/small8/mosdns feeds/small8/v2dat feeds/small8/luci-app-mosdns
 git clone --depth=1 https://github.com/sbwml/luci-app-mosdns package/mosdns
 
 #替换 golang
+rm -rf feeds/packages/lang/golang
 cp -rf ../customize/diy/golang feeds/packages/lang/
