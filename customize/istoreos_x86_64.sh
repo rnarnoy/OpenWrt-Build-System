@@ -90,9 +90,9 @@ rm -rf feeds/small8/ddns-go feeds/small8/luci-app-ddns-go
 git clone --depth=1 https://github.com/sirpdboy/luci-app-ddns-go package/ddnsgo
 
 #替换 mosdns
-rm -rf feeds/small8/mosdns feeds/small8/v2dat feeds/small8/luci-app-mosdns
-git clone --depth=1 https://github.com/sbwml/luci-app-mosdns package/mosdns
+#rm -rf feeds/small8/mosdns feeds/small8/v2dat feeds/small8/luci-app-mosdns
+#git clone --depth=1 https://github.com/sbwml/luci-app-mosdns package/mosdns
 
 #替换 golang
-rm -rf feeds/packages/lang/golang
-cp -rf ../customize/diy/golang feeds/packages/lang/
+#rm -rf feeds/packages/lang/golang
+#cp -rf ../customize/diy/golang feeds/packages/lang/
