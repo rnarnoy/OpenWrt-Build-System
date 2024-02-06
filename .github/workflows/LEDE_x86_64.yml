@@ -72,6 +72,7 @@ jobs:
         ln -sf /mnt/${{ env.BD_PROJECT }}/bin ${{ env.BD_PROJECT }}/bin
         ln -sf /mnt/${{ env.BD_PROJECT }}/staging_dir ${{ env.BD_PROJECT }}/staging_dir
         ln -sf /mnt/${{ env.BD_PROJECT }}/build_dir ${{ env.BD_PROJECT }}/build_dir
+        df -h
 
     - name: Cache
       uses: HiGarfield/cachewrtbuild@main
