@@ -77,5 +77,6 @@ chmod 0755 /etc/init.d/*
 
 sed -i '/small/d' /etc/opkg/distfeeds.conf
 sed -i '/kenzo/d' /etc/opkg/distfeeds.conf
+sed -i '/kiddin9/d' /etc/opkg/distfeeds.conf
 
 exit 0
