@@ -321,6 +321,7 @@ jobs:
           Openclash
           Autotimeset
           AdGuardHome
+          Netdata
           DDNS-go
           ZeroTier
           应用中心(iStore)

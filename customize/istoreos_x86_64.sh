@@ -36,6 +36,9 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-adg
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-openclash
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-passwall
 #git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ssr-plus
+# 更换插件名称
+# sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
+
 
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages brook
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages chinadns-ng
@@ -75,6 +78,9 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddn
 #Netdata
 #git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-netdata
+sed -i 's/"status"/"system"/g' package/linpc/luci-app-netdata/luasrc/controller/*.lua
+sed -i 's/"status"/"system"/g' package/linpc/luci-app-netdata/luasrc/model/cgi/*.lua
+sed -i 's/admin\/status/admin\/system/g' package/linpc/luci-app-netdata/luasrc/view/netdata/*.htm
 
 #zerotier
 #git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
@@ -88,7 +94,6 @@ sed -i 's/192.168.1.1/10.1.1.254/g' ./package/base-files/files/bin/config_genera
 sed -i 's/$1$5mjCdAB1$Uk1sNbwoqfHxUmzRIeuZK1//g' ./package/base-files/files/etc/shadow
 
 # 更换插件名称
-# sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
 sed -i 's/("iStore"),/("应用中心"),/g' feeds/store/luci/luci-app-store/luasrc/controller/store.lua
 
 # 修改内核版本
