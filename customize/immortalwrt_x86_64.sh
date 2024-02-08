@@ -47,6 +47,35 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ssr
 #更换插件名称
 #sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
 
+#ddns-go
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages ddns-go
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddns-go
+# rm -rf feeds/small8/ddns-go feeds/small8/luci-app-ddns-go
+# git clone --depth=1 https://github.com/sirpdboy/luci-app-ddns-go package/ddnsgo
+
+#Netdata
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
+#git clone --depth=1 https://github.com/Jason6111/luci-app-netdata package/linpc/luci-app-netdata
+# 调整 netdata 到 服务 菜单
+#sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/controller/*.lua
+#sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/model/cgi/*.lua
+#sed -i 's/admin\/system/admin\/services/g' feeds/luci/applications/luci-app-netdata/luasrc/view/netdata/*.htm
+
+#mosdns
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages mosdns
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-mosdns
+# 修复插件冲突
+#rm -rf feeds/small8/luci-app-mosdns/root/etc/init.d
+
+#zerotier
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages zerotier
+
+#luci-app-autotimeset
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-autotimeset
+
+
+########依赖包########
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages brook
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages chinadns-ng
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages dns2socks
@@ -79,37 +108,6 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages shadow-tls
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxminddb
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages v2dat
 
-
-#luci-app-turboacc
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-turboacc
-
-#ddns-go
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages ddns-go
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddns-go
-# rm -rf feeds/small8/ddns-go feeds/small8/luci-app-ddns-go
-# git clone --depth=1 https://github.com/sirpdboy/luci-app-ddns-go package/ddnsgo
-
-#Netdata
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
-#git clone --depth=1 https://github.com/Jason6111/luci-app-netdata package/linpc/luci-app-netdata
-# 调整 netdata 到 服务 菜单
-#sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/controller/*.lua
-#sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/model/cgi/*.lua
-#sed -i 's/admin\/system/admin\/services/g' feeds/luci/applications/luci-app-netdata/luasrc/view/netdata/*.htm
-
-#mosdns
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages mosdns
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-mosdns
-# 修复插件冲突
-#rm -rf feeds/small8/luci-app-mosdns/root/etc/init.d
-
-#zerotier
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages zerotier
-
-#luci-app-autotimeset
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-autotimeset
-
 ##########################################其他设置##########################################
 
 # 修改默认登录地址
@@ -135,13 +133,15 @@ sed -i -f ../customize/diy/immortalwrt_10_system.sed feeds/luci/modules/luci-mod
 #修改镜像源
 sed -i 's#mirror.iscas.ac.cn/kernel.org#mirrors.edge.kernel.org/pub#' scripts/download.pl
 
+#修改默认设置
+cp -f ../customize/diy/default-settings package/emortal/default-settings/files/99-default-settings
+
 # 修改 Makefile
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/..\/..\/luci.mk/$(TOPDIR)\/feeds\/luci\/luci.mk/g' {}
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/..\/..\/lang\/golang\/golang-package.mk/$(TOPDIR)\/feeds\/packages\/lang\/golang\/golang-package.mk/g' {}
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/PKG_SOURCE_URL:=@GHREPO/PKG_SOURCE_URL:=https:\/\/github.com/g' {}
 find package/*/ -maxdepth 2 -path "*/Makefile" | xargs -i sed -i 's/PKG_SOURCE_URL:=@GHCODELOAD/PKG_SOURCE_URL:=https:\/\/codeload.github.com/g' {}
 
-#修改默认设置
-cp -f ../customize/diy/default-settings package/emortal/default-settings/files/99-default-settings
+
 
 

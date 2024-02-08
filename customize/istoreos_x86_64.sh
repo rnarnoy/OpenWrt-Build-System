@@ -3,6 +3,7 @@
 # 自定义
 #=================================================
 ##########################################添加额外包##########################################
+mkdir -p package/linpc
 
 # Git稀疏克隆，只克隆指定目录到本地
 function git_sparse_clone() {
@@ -39,7 +40,22 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-pas
 # 更换插件名称
 # sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
 
+#ddns-go
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages ddns-go
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddns-go
 
+#Netdata
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-netdata
+sed -i 's/"status"/"system"/g' package/linpc/luci-app-netdata/luasrc/controller/*.lua
+sed -i 's/"status"/"system"/g' package/linpc/luci-app-netdata/luasrc/model/cgi/*.lua
+sed -i 's/admin\/status/admin\/system/g' package/linpc/luci-app-netdata/luasrc/view/netdata/*.htm
+
+#zerotier
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages zerotier
+
+########依赖包########
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages brook
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages chinadns-ng
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages dns2socks
@@ -70,21 +86,6 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-neturl
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages redsocks2
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages shadow-tls
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxminddb
-
-#ddns-go
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages ddns-go
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddns-go
-
-#Netdata
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-netdata
-sed -i 's/"status"/"system"/g' package/linpc/luci-app-netdata/luasrc/controller/*.lua
-sed -i 's/"status"/"system"/g' package/linpc/luci-app-netdata/luasrc/model/cgi/*.lua
-sed -i 's/admin\/status/admin\/system/g' package/linpc/luci-app-netdata/luasrc/view/netdata/*.htm
-
-#zerotier
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages zerotier
 
 ##########################################其他设置##########################################
 # 修改默认登录地址
