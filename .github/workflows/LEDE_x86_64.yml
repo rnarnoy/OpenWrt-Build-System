@@ -18,6 +18,7 @@ env:
   UPLOAD_ARTIFACT: 'false'   #是否上传到ARTIFACT(true/false)
   UPLOAD_RELEASE: 'true'    #是否上传到RELEASE(true/false)
 
+
 jobs:
   build:
     runs-on: ubuntu-22.04
@@ -72,7 +73,8 @@ jobs:
         ln -sf /mnt/${{ env.BD_PROJECT }}/bin ${{ env.BD_PROJECT }}/bin
         ln -sf /mnt/${{ env.BD_PROJECT }}/staging_dir ${{ env.BD_PROJECT }}/staging_dir
         ln -sf /mnt/${{ env.BD_PROJECT }}/build_dir ${{ env.BD_PROJECT }}/build_dir
-        df -h
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
     - name: Cache
       uses: HiGarfield/cachewrtbuild@main
@@ -170,7 +172,7 @@ jobs:
     - name: Pause workflow for custom
       if: env.SSH_DEBUG == 'true' && env.SSH_SETUP == 'success'
       run: |
-        if [ ! -f /usr/bin/gogogo ]; then       # 插入gogogo命令
+        if ! command -v gogogo > /dev/null; then       # 插入gogogo命令
           echo '#!/bin/bash' > gogogo
           echo 'sudo touch /home/runner/stop_signal' >> gogogo
           sudo chmod a+x gogogo && sudo cp gogogo /usr/bin/
@@ -205,14 +207,16 @@ jobs:
         make download -j$(nproc)
         find dl -size -1024c -exec ls -l {} \;
         find dl -size -1024c -exec rm -f {} \;
-        df -h
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
     - name: Build firmware
       working-directory: ./${{ env.BD_PROJECT }}
       run: |
         echo -e "$(nproc) thread build."
         make -j$(nproc) || make -j1 V=s | tee build.log
-        df -h 
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT 
 
     - name: Check compile
       run: |
@@ -231,7 +235,14 @@ jobs:
           if [ "${{ env.SSH_SETUP }}" == 'success' ]; then
             echo "BD_COMPILE=standby" >> $GITHUB_ENV
             echo "===========编译失败,暂停工作流==========="
-            echo "=======留空等待添加编译失败通知功能======="
+            if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
+            # 如果 IYUU_TOKEN 存在，则执行 curl 命令
+              curl -X POST \
+                'https://iyuu.cn/${{ secrets.IYUU_TOKEN }}.send' \
+                -H 'Content-Type: application/json' \
+                -d '{"text": "编译失败", "desp": "编译失败,已暂停工作流,请使用SSH登录调试"}'
+                echo "=======已通过IYUU接口发送编译失败通知======="
+            fi
           else
             echo "===========编译失败,结束工作流==========="
             exit 1
@@ -349,3 +360,9 @@ jobs:
         name: ${{ env.BD_PROJECT }}-firmware-${{ env.BD_TARGET }}-${{ env.DATE }}
         path: ${{ env.FIRMWARE_PATH }} 
         retention-days: 2
+
+    - name: Check Disk
+      continue-on-error: true
+      run: |
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT

@@ -71,7 +71,8 @@ jobs:
         ln -sf /mnt/${{ env.BD_PROJECT }}/bin ${{ env.BD_PROJECT }}/bin
         ln -sf /mnt/${{ env.BD_PROJECT }}/staging_dir ${{ env.BD_PROJECT }}/staging_dir
         ln -sf /mnt/${{ env.BD_PROJECT }}/build_dir ${{ env.BD_PROJECT }}/build_dir
-        df -h
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
     - name: Cache
       uses: HiGarfield/cachewrtbuild@main
@@ -86,12 +87,12 @@ jobs:
       run: |
         mv $GITHUB_WORKSPACE/feeds/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }} $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/feeds.conf
         ./scripts/feeds update -a
+        ./scripts/feeds install -a
         chmod +x $GITHUB_WORKSPACE/customize/*.sh
         $GITHUB_WORKSPACE/customize/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.sh
         $GITHUB_WORKSPACE/customize/preset-adguard-core.sh ${{ env.TARGET_PLATFORM }}
         $GITHUB_WORKSPACE/customize/preset-clash-core.sh ${{ env.TARGET_PLATFORM }}
-        ./scripts/feeds install -a
-
+        
     - name: "Configuration Customization - Build_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}"
       env:
         CONFIG_FILE: './config/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.config'
@@ -171,54 +172,35 @@ jobs:
     - name: Pause workflow
       if: env.SSH_DEBUG == 'true'
       run: |
-        if [ ! -f /usr/bin/gogogo ]; then #插入gogogo命令
-          echo '#!/bin/bash' > gogogo
-          echo 'sudo touch /home/runner/stop_signal' >> gogogo
-          sudo chmod a+x gogogo && sudo cp gogogo /usr/bin/
-          echo "================gogogo命令已加载!================"
-          echo "                                                "
-          echo "                                                "
-        else
-          echo "================gogogo命令已存在!================"
-          echo "                                                "
-          echo "                                                "
+        # 引入函数库
+        source $GITHUB_WORKSPACE/customize/diy/functions.sh
+        # 输出消息
+        echo "====================暂停工作流===================="
+        if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+          echo -n -e "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
         fi
-        echo -n -e "===================暂停工作流==================="      # 倒计时循环
-        count=0  #分钟循环
-        while [ ! -f /home/runner/stop_signal ] && [ $count -lt ${{ env.SSH_TIME }} ]; do
-          inner_count=0  #秒钟循环
-          while [ $inner_count -lt 60 ]; do
-            echo -n -e "已过时间：$count分钟$inner_count秒,可使用 gogogo 命令提前继续工作流! \033[0K\r"
-            if [ -f /home/runner/stop_signal ]; then
-              break  # 如果文件存在，立即退出子循环
-            fi
-            sleep 1
-            inner_count=$((inner_count + 1))
-          done
+
+        # 倒计时,初始化内部计数器，用于控制循环次数
+        count=0 
+
+        # 在未收到停止信号且内部计数器未达到设定的时间限制时，执行循环
+        while [ ! -f ~/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
+          echo -n -e "已过时间：$((count / 60))分钟$((count % 60))秒，可使用gogogo命令提前继续工作流! \033[0K\r"
+          # 检查编译结果
+          check_compile_result
+          # 如果接收到停止信号，退出循环
+          if [ -f ~/stop_signal ]; then
+            break
+          fi
+          # 每秒钟增加内部计数器
+          sleep 1
           count=$((count + 1))
         done
-        # 循环结束后删除文件
-        sudo rm -f /home/runner/stop_signal
 
-    - name: Check compile
-      run: |
-        cd ${{ env.BD_PROJECT }}/bin/targets/*/*
-        if [ -n "$(ls *.img.gz)" ]; then
-          echo "BD_COMPILE=success" >> $GITHUB_ENV
-          echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-          echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-          echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
-          uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-          echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
-          tar -czvf packages.tar.gz packages
-          rm -rf packages
-          echo "===========编译成功,准备上传==========="
-        else
-          echo "BD_COMPILE=failure" >> $GITHUB_ENV
-          echo "===========编译失败,结束工作流==========="
+        # 处理编译失败
+        if [ "${{ env.BD_COMPILE }}" == 'failure' ]; then
           exit 1
         fi
-
 
     # - name: Upload Firmware To Release
     #   if: env.BD_COMPILE == 'success' && env.UPLOAD_RELEASE == 'true'
@@ -274,3 +256,9 @@ jobs:
         name: ${{ env.BD_PROJECT }}-firmware-${{ env.BD_TARGET }}-${{ env.DATE }}
         path: ${{ env.FIRMWARE_PATH }} 
         retention-days: 2
+
+    - name: Check Disk
+      continue-on-error: true
+      run: |
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
