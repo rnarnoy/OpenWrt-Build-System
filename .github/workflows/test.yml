@@ -172,8 +172,8 @@ jobs:
     - name: Pause workflow
       if: env.SSH_DEBUG == 'true'
       run: |
-        # 加载gogogo命令
-        sudo echo $GITHUB_WORKSPACE/customize/diy/gogogo.sh >> /etc/bash.bashrc
+        # # 加载gogogo命令
+        # sudo echo $GITHUB_WORKSPACE/customize/diy/gogogo.sh >> /etc/bash.bashrc
         # 引入函数库
         source $GITHUB_WORKSPACE/customize/diy/functions.sh
         # 输出消息
@@ -186,7 +186,7 @@ jobs:
         count=0 
 
         # 在未收到停止信号且内部计数器未达到设定的时间限制时，执行循环
-        while [ ! -f ~/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
+        while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
           echo -n -e "已过时间：$((count / 60))分钟$((count % 60))秒，可使用gogogo命令提前继续工作流! \033[0K\r"
           # 检查编译结果
           check_compile_result

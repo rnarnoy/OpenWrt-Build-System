@@ -1,3 +1,16 @@
+if [ ! -f /usr/bin/gogogo ]; then   #  插入gogogo命令
+    echo '#!/bin/bash' > gogogo
+    echo 'sudo touch /home/runner/stop_signal' >> gogogo
+    sudo chmod a+x gogogo && sudo cp gogogo /usr/bin/
+    echo "================gogogo命令已加载!================"
+    echo "                                                "
+    echo "                                                "
+else
+    echo "================gogogo命令已存在!================"
+    echo "                                                "
+    echo "                                                "
+fi
+
 function send_message() {
     if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
         # 发送消息到 IYUU 接口
@@ -19,7 +32,7 @@ function send_message() {
 }
 
 function check_compile_result() {
-    if [ -f ~/stop_signal ]; then
+    if [ -f /home/runner/stop_signal ]; then
         if [ -n "$(ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/*.img.gz)" ]; then
             echo "BD_COMPILE=success" >> $GITHUB_ENV
             echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
@@ -33,7 +46,7 @@ function check_compile_result() {
             send_message "编译成功,准备上传" "编译成功,准备上传"
             break
         else
-            rm -f ~/stop_signal
+            rm -f /home/runner/stop_signal
             echo "===========编译失败,继续暂停===========" | sudo wall
             echo "BD_COMPILE=failure" >> $GITHUB_ENV
             send_message "编译失败,继续暂停" "编译失败,继续暂停"
