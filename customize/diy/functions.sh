@@ -11,7 +11,7 @@ else
     echo "                                                "
 fi
 
-function send_message() {
+send_message() {
     if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
         # 发送消息到 IYUU 接口
         curl -X POST \
@@ -31,9 +31,9 @@ function send_message() {
     fi
 }
 
-function check_compile_result() {
+check_compile_result() {
     if [ -f /home/runner/stop_signal ]; then
-        if [ -n "$(ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/*.img.gz)" ]; then
+        if [ -n "$(ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ *.img.gz)" ]; then
             echo "BD_COMPILE=success" >> $GITHUB_ENV
             echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
             echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV

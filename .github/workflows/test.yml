@@ -187,7 +187,7 @@ jobs:
 
         # 在未收到停止信号且内部计数器未达到设定的时间限制时，执行循环
         while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
-          echo -n -e "已过时间：$((count / 60))分钟$((count % 60))秒，可使用gogogo命令提前继续工作流! \033[0K\r"
+          echo -n -e "已过时间：$((count / 60))分钟$((count % 60))秒，可使用gogogo命令提前继续工作流! \x1B[0K\r"
           # 检查编译结果
           check_compile_result
           # 每秒钟增加内部计数器
