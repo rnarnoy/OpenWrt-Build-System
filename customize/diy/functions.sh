@@ -33,7 +33,7 @@ send_message() {
 
 check_compile_result() {
     if [ -f /home/runner/stop_signal ]; then
-        if [ -n "$(ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ *.img.gz)" ]; then
+        if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
             echo "BD_COMPILE=success" >> $GITHUB_ENV
             echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
             echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
