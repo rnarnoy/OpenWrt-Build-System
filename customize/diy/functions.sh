@@ -1,8 +1,3 @@
-function gogogo() {
-    touch ~/stop_signal
-    echo "================gogogo命令已执行!================"
-}
-
 function send_message() {
     if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
         # 发送消息到 IYUU 接口
@@ -25,7 +20,7 @@ function send_message() {
 
 function check_compile_result() {
     if [ -f ~/stop_signal ]; then
-        if [ -n "$(ls ${{ env.BD_PROJECT }}/bin/targets/*/*/*.img.gz)" ]; then
+        if [ -n "$(ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/*.img.gz)" ]; then
             echo "BD_COMPILE=success" >> $GITHUB_ENV
             echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
             echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -36,6 +31,7 @@ function check_compile_result() {
             rm -rf packages
             echo "===========编译成功,准备上传===========" | sudo wall
             send_message "编译成功,准备上传" "编译成功,准备上传"
+            break
         else
             rm -f ~/stop_signal
             echo "===========编译失败,继续暂停===========" | sudo wall
@@ -45,6 +41,5 @@ function check_compile_result() {
     fi
 }
 
-echo "================ gogogo命令已加载 ================"
 echo "================= 通知模块已加载 ================="
 echo "================= 校验模块已加载 ================="
