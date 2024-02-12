@@ -1,4 +1,4 @@
-if [ ! -f /usr/bin/gogogo ]; then   #  插入gogogo命令
+if ! command -v gogogo > /dev/null; then
     echo '#!/bin/bash' > gogogo
     echo 'sudo touch /home/runner/stop_signal' >> gogogo
     sudo chmod a+x gogogo && sudo cp gogogo /usr/bin/
