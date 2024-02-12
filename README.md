@@ -51,14 +51,15 @@ SSH_TIME2  设置编译报错后暂停时间,单位分钟,可用pkill sleep命�
 ---
 #### 自定义选项
 ```
-1.点击仓库的"Settings"  ==> 2.选择 "Actions secrets and variables" ==> 3.点击 "Actions" ==> 4.点击 "New repository secret" ==> 5.填写Secret 信息
+点击仓库的"Settings"  ==> 选择 "Actions secrets and variables" ==> 点击 "Actions" ==> 点击 "New repository secret" ==> 填写Secret 信息
 ```
 |Name |Value说明|
 |----------|--------------------------------------------------|
 |SSH_PW|   用于定义ssh访问的root密码,不设置默认123|
 | FRPC_CONFIG|  用于定义frpc的配置文件,不设置将自动尝试使用公共frp服务器并生成SSH连接命令|
-| IYUU_TOKEN| 使用[爱语飞飞](https://iyuu.cn/)通知编译结果,前往[官网](https://iyuu.cn/)申请Token|
-| SERVERCHAN_SCKEY| 使用[Server酱](https://sct.ftqq.com/)通知编译结果,前往[官网](https://sct.ftqq.com/)申请SendKey|
+| IYUU_TOKEN| 爱语飞飞Token,用于通知编译结果,前往[官网](https://iyuu.cn/)申请|
+| SERVERCHAN_SCKEY| Server酱SendKey,用于通知编译结果,前往[官网](https://sct.ftqq.com/)申请|
+###### 爱语飞飞,Server酱二选一即可
   
 
 ---
