@@ -32,7 +32,7 @@ send_message() {
 }
 
 check_compile() {
-    if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
+    if ls bin/targets/*/*/ | grep -q '\.img\.gz$'; then
         (
             cd bin/targets/*/*/
             echo "BD_COMPILE=success" >> $GITHUB_ENV
