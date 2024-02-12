@@ -200,13 +200,36 @@ jobs:
               echo "=======已通过Server酱发送通知======="
           fi
         }
+
+        check_compile() {
+          if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
+          cd $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/
+          echo "BD_COMPILE=success" >> $GITHUB_ENV
+          echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
+          echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+          echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
+          uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
+          echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
+          tar -czvf packages.tar.gz packages
+          rm -rf packages
+          echo "===========编译成功,准备上传==========="
+          send_message "编译成功,准备上传" "编译成功,准备上传"
+          break
+          else
+          rm -f /home/runner/stop_signal
+          echo "===========编译失败,继续暂停==========="
+          echo "BD_COMPILE=failure" >> $GITHUB_ENV
+          send_message "编译失败,继续暂停" "编译失败,继续暂停"
+          fi
+        }
+
         # 引入函数库
         # source $GITHUB_WORKSPACE/customize/diy/functions.sh
         # 输出消息
         echo "====================暂停工作流===================="
         echo "==========可使用 gogogo 命令提前继续工作流=========="
         if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
-          echo -n -e "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
+          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
         fi
 
         # 倒计时,初始化内部计数器，用于控制循环次数
@@ -218,27 +241,7 @@ jobs:
               count=$((count + 1))
           done
           echo -ne "\033[0K已过时间：$((count / 60))分钟$((count % 60))秒. \r"
-          if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
-            (
-                cd bin/targets/*/*/
-                echo "BD_COMPILE=success" >> $GITHUB_ENV
-                echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-                echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-                echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
-                uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-                echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
-                tar -czvf packages.tar.gz packages
-                rm -rf packages
-                echo "===========编译成功,准备上传==========="
-                send_message "编译成功,准备上传" "编译成功,准备上传"
-            )
-            break
-          else
-              rm -f /home/runner/stop_signal
-              echo "===========编译失败,继续暂停==========="
-              echo "BD_COMPILE=failure" >> $GITHUB_ENV
-              send_message "编译失败,继续暂停" "编译失败,继续暂停"
-          fi
+          check_compile
         done
 
         # 处理编译失败
