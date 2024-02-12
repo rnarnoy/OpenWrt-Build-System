@@ -33,55 +33,25 @@ send_message() {
 
 check_compile() {
     if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
-    cd $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/
-    echo "BD_COMPILE=success" >> $GITHUB_ENV
-    echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-    echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-    echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
-    uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-    echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
-    tar -czvf packages.tar.gz packages
-    rm -rf packages
-    echo "===========编译成功,准备上传==========="
-    send_message "编译成功,准备上传" "编译成功,准备上传"
-    break
+        cd $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/
+        echo "BD_COMPILE=success" >> $GITHUB_ENV
+        echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
+        echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+        echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
+        uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
+        echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
+        tar -czvf packages.tar.gz packages
+        rm -rf packages
+        echo "===========编译成功,准备上传==========="
+        send_message "编译成功,准备上传" "编译成功,准备上传"
+        break
     else
-    cd $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}
-    rm -f /home/runner/stop_signal
-    echo "===========编译失败,继续暂停==========="
-    echo "BD_COMPILE=failure" >> $GITHUB_ENV
-    send_message "编译失败,继续暂停" "编译失败,继续暂停"
+        rm -f /home/runner/stop_signal
+        echo "===========编译失败,继续暂停==========="
+        echo "BD_COMPILE=failure" >> $GITHUB_ENV
+        send_message "编译失败,继续暂停" "编译失败,继续暂停"
     fi
 }
 
 echo "================= 通知模块已加载 ================="
 echo "================= 校验模块已加载 ================="
-
-
-# count=0
-# while [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
-#     while [ ! -f /home/runner/stop_signal ]; do
-#         echo -ne "\033[0K已过时间：$((count / 60))分钟$((count % 60))秒，可使用gogogo命令提前继续工作流! \r"        # 每秒钟增加内部计数器
-#         sleep 1
-#         count=$((count + 1))
-#     done
-#     if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
-#         cd bin/targets/*/*/
-#         echo "BD_COMPILE=success" >> $GITHUB_ENV
-#         echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-#         echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-#         echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
-#         uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-#         echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
-#         tar -czvf packages.tar.gz packages
-#         rm -rf packages
-#         echo "===========编译成功,准备上传==========="
-#         send_message "编译成功,准备上传" "编译成功,准备上传"
-#         break
-#     else
-#         rm -f /home/runner/stop_signal
-#         echo "===========编译失败,继续暂停==========="
-#         echo "BD_COMPILE=failure" >> $GITHUB_ENV
-#         send_message "编译失败,继续暂停" "编译失败,继续暂停"
-#     fi
-# done
