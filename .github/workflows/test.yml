@@ -185,7 +185,7 @@ jobs:
         count=0
         while [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
         # 每秒钟增加内部计数器
-          while [ ! -f /home/runner/stop_signal ]; do
+          while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
               sleep 1
               count=$((count + 1))
           done
