@@ -55,4 +55,50 @@ send_message() {
 # }
 
 echo "================= 通知模块已加载 ================="
-echo "================= 校验模块已加载 ================="
+#echo "================= 校验模块已加载 ================="
+
+
+# count=0
+# progress_bar_format=$(tput sgr0)  # 清除所有属性
+# progress_bar_format+=$(tput bold)  # 设置为粗体
+# progress_bar_format+=$(tput setaf 2)  # 设置为亮绿色
+# while [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
+# # 每秒钟增加内部计数器
+#     while ! test -f /home/runner/stop_signal; do
+#         # 计算当前时间
+#         elapsed_minutes=$(date +%M)
+#         elapsed_seconds=$(date +%S)
+#         elapsed_time="$elapsed_minutes分钟$elapsed_seconds秒"
+
+#         # 更新进度条
+#         progress_bar_length=10
+#         progress_bar=$(printf "%${progress_bar_length}s" "[$(tput setaf 2);$(tput sgr0)]" | sed "s/ *$/${count}/")
+#         printf "%s\r" "$progress_bar"
+
+#         # 每秒钟增加内部计数器
+#         count=$((count + 1))
+#         sleep 1
+#     done
+
+#     if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
+#         cd bin/targets/*/*/
+#         echo "BD_COMPILE=success" >> $GITHUB_ENV
+#         echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
+#         echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+#         echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
+#         uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
+#         echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
+#         tar -czvf packages.tar.gz packages
+#         rm -rf packages
+#         echo "===========编译成功,准备上传==========="
+#         send_message "编译成功,准备上传" "编译成功,准备上传"
+#         break
+#     else
+#         rm -f /home/runner/stop_signal
+#         echo "===========编译失败,继续暂停==========="
+#         echo "BD_COMPILE=failure" >> $GITHUB_ENV
+#         send_message "编译失败,继续暂停" "编译失败,继续暂停"
+#     fi
+# done
+# # 清除进度条格式
+# printf "%s\n" "$progress_bar_format"

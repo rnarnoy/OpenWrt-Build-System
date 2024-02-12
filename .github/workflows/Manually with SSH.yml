@@ -198,6 +198,8 @@ jobs:
           sleep 1
           count=$((count + 1))
         done
+        # 循环结束后删除停止信号文件
+        sudo rm -f /home/runner/stop_signal
 
         # 处理编译失败
         if [ "${{ env.BD_COMPILE }}" == 'failure' ]; then
