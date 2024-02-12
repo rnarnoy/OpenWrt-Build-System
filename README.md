@@ -47,42 +47,20 @@ env:
 SSH_TIME    设置开始编译前暂停时间,单位分钟,可用pkill sleep命令提前继续工作流
 SSH_TIME2  设置编译报错后暂停时间,单位分钟,可用pkill sleep命令提前继续工作流
 ```
-   
-   
----
-#### SSH连接命令
-
-在工作流的Setup ssh for debug步骤中会显示
-```
-============frpc启动成功!===========
-==========以下是SSH连接命令==========
-ssh root@xxx -p xxxx
-```
-密码为SSH_PW定义的密码,不设置则为123
-   
 
 ---
 #### 自定义选项
 ```
-1.点击仓库的"Settings"
+1.点击仓库的"Settings"  ==> 2.选择 "Actions secrets and variables" ==> 3.点击 "Actions" ==> 4.点击 "New repository secret" ==> 5.填写Secret 信息
+```
+|Name |Value说明|
+|----------|--------------------------------------------------|
+|SSH_PW|   用于定义ssh访问的root密码,不设置默认123|
+| FRPC_CONFIG|  用于定义frpc的配置文件,不设置将自动尝试使用公共frp服务器并生成SSH连接命令|
+| IYUU_TOKEN| 使用[爱语飞飞](https://iyuu.cn/)通知编译结果,前往[官网](https://iyuu.cn/)申请Token|
+| SERVERCHAN_SCKEY| 使用[Server酱](https://sct.ftqq.com/)通知编译结果,前往[官网](https://sct.ftqq.com/)申请SendKey|
+  
 
-2.选择 "Actions secrets and variables"
-
-3.点击 "New repository secret"
-
-4.填写 Secret 信息：
-  Name（名称）：
-  Value（值）：
-```
-```
-SSH_PW     # 用于定义ssh访问的root密码,不设置默认123
-```
-
-```
-FRPC_CONFIG  # 用于定义frpc的配置文件,不设置将自动尝试使用公共frp服务器并生成SSH连接命令
-```
-   
-   
 ---
 #### FRPC_CONFIG示例
 ##### frp.freefrp.net是个公共服务器,所以可能会与他人配置冲突,默认会随机生成端口并尝试连接
@@ -101,7 +79,17 @@ remote_port = 22222
 ##### `备选公共服务器frp1.freefrp.net;frp2.freefrp.net;www.freefrps.com`
 ##### 若使用公共服务器只需要修改frpc.ini.example中  [common]  部分的内容
    
+---
+#### SSH连接命令
 
+在工作流的Setup ssh for debug步骤中会显示
+```
+============frpc启动成功!===========
+==========以下是SSH连接命令==========
+ssh root@xxx -p xxxx
+```
+密码为SSH_PW定义的密码,不设置则为123
+   
 ---
 # 添加新项目
    

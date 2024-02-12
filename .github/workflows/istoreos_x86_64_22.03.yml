@@ -172,32 +172,15 @@ jobs:
     - name: Pause workflow for custom
       if: env.SSH_DEBUG == 'true' && env.SSH_SETUP == 'success'
       run: |
-        if ! command -v gogogo > /dev/null; then       # 插入gogogo命令
-          echo '#!/bin/bash' > gogogo
-          echo 'sudo touch /home/runner/stop_signal' >> gogogo
-          sudo chmod a+x gogogo && sudo cp gogogo /usr/bin/
-          echo "================gogogo命令已加载!================"
-          echo "                                                "
-          echo "                                                "
-        else
-          echo "================gogogo命令已存在!================"
-          echo "                                                "
-          echo "                                                "
-        fi
+        # 加载gogogo命令
+        source $GITHUB_WORKSPACE/customize/diy/gogogo.sh
         echo -n -e "===================暂停工作流==================="      # 倒计时循环
-        count=0  #分钟循环
-        while [ ! -f /home/runner/stop_signal ] && [ $count -lt ${{ env.SSH_TIME }} ]; do
-          inner_count=0  #秒钟循环
-          while [ $inner_count -lt 60 ]; do
-            echo -n -e "已过时间：$count分钟$inner_count秒,可使用 gogogo 命令提前继续工作流! \033[0K\r"
-            if [ -f /home/runner/stop_signal ]; then
-              break  # 如果文件存在，立即退出子循环
-            fi
-            sleep 1
-            inner_count=$((inner_count + 1))
-          done
+        count=0
+        while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
+          sleep 1
           count=$((count + 1))
         done
+        echo "已过时间：$((count / 60))分钟$((count % 60))秒"
         # 循环结束后删除文件
         sudo rm -f /home/runner/stop_signal
         
@@ -220,6 +203,27 @@ jobs:
 
     - name: Check compile
       run: |
+        # 加载消息通知功能
+        send_message() {
+          if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
+            # 发送消息到 IYUU 接口
+            curl -X POST \
+            "https://iyuu.cn/${{ secrets.IYUU_TOKEN }}.send" \
+            -H 'Content-Type: application/json' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过IYUU接口发送通知======="
+          fi
+      
+          if [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+            # 发送消息到 Server酱
+            curl -X POST \
+            "https://sc.ftqq.com/${{ secrets.SERVERCHAN_SCKEY }}.send" \
+            -H 'Content-Type: application/json;charset=utf-8' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过Server酱发送通知======="
+          fi
+        }
+
         cd ${{ env.BD_PROJECT }}/bin/targets/*/*
         if [ -n "$(ls *.img.gz)" ]; then
           echo "BD_COMPILE=success" >> $GITHUB_ENV
@@ -235,14 +239,7 @@ jobs:
           if [ "${{ env.SSH_SETUP }}" == 'success' ]; then
             echo "BD_COMPILE=standby" >> $GITHUB_ENV
             echo "===========编译失败,暂停工作流==========="
-            if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
-            # 如果 IYUU_TOKEN 存在，则执行 curl 命令
-            curl -X POST \
-              'https://iyuu.cn/${{ secrets.IYUU_TOKEN }}.send' \
-              -H 'Content-Type: application/json' \
-              -d '{"text": "编译失败", "desp": "编译失败,已暂停工作流,请使用SSH登录调试"}'
-              echo "=======已通过IYUU接口发送编译失败通知======="
-            fi
+            send_message "编译失败" "编译失败,已暂停工作流,请使用SSH登录调试"
           else
             echo "===========编译失败,结束工作流==========="
             exit 1
@@ -252,36 +249,34 @@ jobs:
     - name: Pause workflow for debug 
       if: env.BD_COMPILE == 'standby'
       run: |
-        cd ${{ env.BD_PROJECT }}/bin/targets/*/*
+        # 加载gogogo命令
+        source $GITHUB_WORKSPACE/customize/diy/gogogo.sh
 
-        if [ ! -f /usr/bin/gogogo ]; then   #  插入gogogo命令
-          echo '#!/bin/bash' > gogogo
-          echo 'sudo touch /home/runner/stop_signal' >> gogogo
-          sudo chmod a+x gogogo && sudo cp gogogo /usr/bin/
-          echo "================gogogo命令已加载!================"
-          echo "                                                "
-          echo "                                                "
-        else
-          echo "================gogogo命令已存在!================"
-          echo "                                                "
-          echo "                                                "
-        fi
-
-        echo -n -e "===================暂停工作流==================="  #  倒计时循环
-        count=0  #分钟循环
-        while [ ! -f /home/runner/stop_signal ] && [ $count -lt ${{ env.SSH_TIME2 }} ]; do
-          inner_count=0  #秒钟循环
-          while [ $inner_count -lt 60 ]; do
-            echo -n -e "已过时间：$count分钟$inner_count秒,可使用gogogo命令提前继续工作流! \033[0K\r"
-            if [ -f /home/runner/stop_signal ]; then
-              break  # 如果文件存在，立即退出子循环
-            fi
-            sleep 1
-            inner_count=$((inner_count + 1))
-          done
-
-        if [ -f /home/runner/stop_signal ]; then      #       检测是否编译成功
-          if [ -n "$(ls *.img.gz)" ]; then
+        # 加载消息通知功能
+        send_message() {
+          if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
+            # 发送消息到 IYUU 接口
+            curl -X POST \
+            "https://iyuu.cn/${{ secrets.IYUU_TOKEN }}.send" \
+            -H 'Content-Type: application/json' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过IYUU接口发送通知======="
+          fi
+      
+          if [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+            # 发送消息到 Server酱
+            curl -X POST \
+            "https://sc.ftqq.com/${{ secrets.SERVERCHAN_SCKEY }}.send" \
+            -H 'Content-Type: application/json;charset=utf-8' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过Server酱发送通知======="
+          fi
+        }
+        
+        # 加载编译结果检查功能
+        check_compile() {
+          if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
+            cd $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/
             echo "BD_COMPILE=success" >> $GITHUB_ENV
             echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
             echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
@@ -291,16 +286,36 @@ jobs:
             tar -czvf packages.tar.gz packages
             rm -rf packages
             echo "===========编译成功,准备上传==========="
+            send_message "编译成功,准备上传" "编译成功,准备上传"
             break
           else
-            sudo rm -f /home/runner/stop_signal
+            rm -f /home/runner/stop_signal
             echo "===========编译失败,继续暂停==========="
             echo "BD_COMPILE=failure" >> $GITHUB_ENV
+          send_message "编译失败,继续暂停" "编译失败,继续暂停"
           fi
+        }
+
+        # 输出消息
+        echo "====================暂停工作流===================="
+        echo "==========可使用 gogogo 命令提前继续工作流=========="
+        if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
         fi
-          count=$((count + 1))        
+
+        # 倒计时,初始化内部计数器，用于控制循环次数
+        count=0 
+        while [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
+          # 每秒钟增加内部计数器
+          while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
+            sleep 1
+            count=$((count + 1))        
+          done
+          echo "已过时间：$((count / 60))分钟$((count % 60))秒..."
+          check_compile
         done
 
+        # 处理编译失败
         if [ "${{ env.BD_COMPILE }}" == 'failure' ]; then
           exit 1
         fi
