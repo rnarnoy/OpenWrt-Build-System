@@ -51,7 +51,7 @@ SSH_TIME2  设置编译报错后暂停时间,单位分钟,可用pkill sleep命�
 ---
 #### 自定义选项
 ```
-点击仓库的"Settings"  ==> 选择 "Actions secrets and variables" ==> 点击 "Actions" ==> 点击 "New repository secret" ==> 填写Secret 信息
+点击仓库的Settings  ==> Actions secrets and variables ==> Actions ==> New repository secret ==> 填写Secret 信息
 ```
 |Name |Value说明|
 |----------|--------------------------------------------------|
