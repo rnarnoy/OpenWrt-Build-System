@@ -172,61 +172,26 @@ jobs:
     - name: Pause workflow
       if: env.SSH_DEBUG == 'true'
       run: |
-        # # 加载gogogo命令
-        # sudo echo $GITHUB_WORKSPACE/customize/diy/gogogo.sh >> /etc/bash.bashrc
         # 引入函数库
         source $GITHUB_WORKSPACE/customize/diy/functions.sh
         # 输出消息
         echo "====================暂停工作流===================="
+        echo "==========可使用 gogogo 命令提前继续工作流=========="
         if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
           echo -n -e "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
         fi
 
         # 倒计时,初始化内部计数器，用于控制循环次数
         count=0
-        progress_bar_format=$(tput sgr0)  # 清除所有属性
-        progress_bar_format+=$(tput bold)  # 设置为粗体
-        progress_bar_format+=$(tput setaf 2)  # 设置为亮绿色
         while [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
         # 每秒钟增加内部计数器
-            while ! test -f /home/runner/stop_signal; do
-                # 计算当前时间
-                elapsed_minutes=$(date +%M)
-                elapsed_seconds=$(date +%S)
-                elapsed_time="$elapsed_minutes分钟$elapsed_seconds秒"
-        
-                # 更新进度条
-                progress_bar_length=10
-                progress_bar=$(printf "%${progress_bar_length}s" "[$(tput setaf 2);$(tput sgr0)]" | sed "s/ *$/${count}/")
-                printf "%s\r" "$progress_bar"
-        
-                # 每秒钟增加内部计数器
-                count=$((count + 1))
-                sleep 1
-            done
-        
-            if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
-                cd bin/targets/*/*/
-                echo "BD_COMPILE=success" >> $GITHUB_ENV
-                echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-                echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-                echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
-                uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-                echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
-                tar -czvf packages.tar.gz packages
-                rm -rf packages
-                echo "===========编译成功,准备上传==========="
-                send_message "编译成功,准备上传" "编译成功,准备上传"
-                break
-            else
-                rm -f /home/runner/stop_signal
-                echo "===========编译失败,继续暂停==========="
-                echo "BD_COMPILE=failure" >> $GITHUB_ENV
-                send_message "编译失败,继续暂停" "编译失败,继续暂停"
-            fi
+          while [ ! -f /home/runner/stop_signal ]; do
+              sleep 1
+              count=$((count + 1))
+          done
+          echo -ne "\033[0K已过时间：$((count / 60))分钟$((count % 60))秒. \r"
+          check_compile
         done
-        # 清除进度条格式
-        printf "%s\n" "$progress_bar_format"
 
         # 处理编译失败
         if [ "${{ env.BD_COMPILE }}" == 'failure' ]; then
