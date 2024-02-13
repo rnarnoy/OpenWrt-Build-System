@@ -1,8 +1,9 @@
 name: LEDE_x86_64
 
 on: 
-  repository_dispatch:
   workflow_dispatch:
+  schedule:
+    - cron: 0 0 1,15 * *
 
 env:
   BD_PROJECT: 'lede'       #项目名称

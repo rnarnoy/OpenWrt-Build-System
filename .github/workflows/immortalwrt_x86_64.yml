@@ -1,8 +1,9 @@
 name: immortalwrt_x86_64_23.05
 
 on: 
-  repository_dispatch:
   workflow_dispatch:
+  schedule:
+    - cron: 0 12 1,15 * *
 
 env:
   BD_PROJECT: 'immortalwrt'        #项目名称

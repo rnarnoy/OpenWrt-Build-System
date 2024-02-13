@@ -1,8 +1,9 @@
 name: iStoreOS_x86_64_22.03
 
 on: 
-  repository_dispatch:
   workflow_dispatch:
+  schedule:
+    - cron: 0 6 1,15 * *
 
 env:
   BD_PROJECT: 'istoreos'       #项目名称
