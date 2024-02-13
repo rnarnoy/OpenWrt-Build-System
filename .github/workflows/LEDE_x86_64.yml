@@ -326,10 +326,11 @@ jobs:
       uses: ncipollo/release-action@main
       with:
         name: ${{ env.DATE }}_${{ env.Uppercase_String }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
-        #allowUpdates: true
+        allowUpdates: true
         tag: ${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: ${{ env.FIRMWARE_PATH }}/*
+        replacesArtifacts: false
         body: |
           ===Firmware ${{ env.Uppercase_String }} for ${{ env.BD_TARGET }}===
           ### 📒 固件信息
