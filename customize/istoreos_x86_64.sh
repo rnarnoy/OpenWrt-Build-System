@@ -89,7 +89,7 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxmindd
 
 ##########################################其他设置##########################################
 # 修改默认登录地址
-sed -i 's/192.168.1.1/10.1.1.254/g' ./package/base-files/files/bin/config_generate
+# sed -i 's/192.168.1.1/10.1.1.254/g' ./package/base-files/files/bin/config_generate
 
 # 修改默认登录密码
 sed -i 's/$1$5mjCdAB1$Uk1sNbwoqfHxUmzRIeuZK1//g' ./package/base-files/files/etc/shadow
@@ -109,7 +109,7 @@ cp -f ../customize/diy/istoreos_10_system.js feeds/luci/modules/luci-mod-status/
 
 #修改默认设置
 mkdir -p files/etc/uci-defaults
-cp  ../customize/diy/default-settings files/etc/uci-defaults/99-init-settings
+cp  ../customize/diy/default-settings files/etc/uci-defaults/zzz-init-settings
 
 
 #修改镜像源

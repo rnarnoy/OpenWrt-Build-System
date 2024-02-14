@@ -72,11 +72,20 @@ echo 'hsts=0' > /root/.wgetrc
 rm -f "/www/luci-static/resources/view/status/include/29_ethinfo.js"
 rm -f "/tmp/luci-indexcache"
 rm -rf "/tmp/luci-modulecache"
+rm -f /etc/config/adguardhome
+rm -f /etc/init.d/adguardhome
+
 
 chmod 0755 /etc/init.d/*
 
 sed -i '/small/d' /etc/opkg/distfeeds.conf
 sed -i '/kenzo/d' /etc/opkg/distfeeds.conf
 sed -i '/kiddin9/d' /etc/opkg/distfeeds.conf
+
+
+uci set network.lan.proto='static'       # 设置 lan 接口协议为 static
+uci set network.lan.ipaddr='10.1.1.254'  # 设置 lan 接口的 IP 地址为 10.1.1.254
+uci set network.lan.netmask='255.255.255.0'  # 设置 lan 接口的子网掩码为 255.255.255.0
+uci commit network
 
 exit 0
