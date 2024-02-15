@@ -13,7 +13,7 @@ on:
           - lede_x86_64_master
           - immortalwrt_x86_64_23.05
           - istoreos_x86_64_22.03
-          - 纯手动环境配置
+          - 手动克隆源码
 
 env:
   # BD_PROJECT: 'istoreos'       #项目名称
@@ -102,7 +102,8 @@ jobs:
         else
           # 执行针对纯手动环境配置操作
           echo "BD_Custom=true" >> $GITHUB_ENV
-          echo "针对 纯手动环境配置 请自行克隆源码及配置文件"      
+          echo "BD_PROJECT=*" >> $GITHUB_ENV
+          echo "针对 手动克隆源码 的环境设置完成,一次只能克隆一个项目"   
         fi
 
     - name: Clone source code
@@ -252,13 +253,13 @@ jobs:
         check_compile() {
           cd ${{ env.BD_PROJECT }}/bin/targets/*/*
           if [ -n "$(ls *.img.gz)" ]; then
-            echo "BD_COMPILE=success" >> "$GITHUB_ENV"
-            echo "FIRMWARE_PATH=$PWD" >> "$GITHUB_ENV"
-            echo "DATE=$(date +"%Y.%m.%d")" >> "$GITHUB_ENV"
+            echo "BD_COMPILE=success" >> $GITHUB_ENV
+            echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
+            echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
             KERNEL=$(cat *.manifest | awk '/^kernel/ {print $2}' | tr -d ' ')
-            echo "KERNEL=$KERNEL" >> "$GITHUB_ENV"
+            echo "KERNEL=$KERNEL" >> $GITHUB_ENV
             Uppercase_String=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-            echo "Uppercase_String=$Uppercase_String" >> "$GITHUB_ENV"        
+            echo "Uppercase_String=$Uppercase_String" >> $GITHUB_ENV        
             tar -czvf packages.tar.gz packages
             rm -rf packages        
             echo "===========编译成功,准备上传==========="
@@ -266,7 +267,7 @@ jobs:
           else
             rm -f /home/runner/stop_signal
             echo "===========编译失败,继续暂停==========="
-            echo "BD_COMPILE=failure" >> "$GITHUB_ENV"
+            echo "BD_COMPILE=failure" >> $GITHUB_ENV
             send_message "编译失败,继续暂停" "编译失败,继续暂停"
             return 1  # 返回非零值表示编译失败
           fi
