@@ -250,9 +250,8 @@ jobs:
         
         # 加载编译结果检查功能
         check_compile() {
-          compile_dir="$GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/"          
-          if ls "$compile_dir" | grep -q '\.img\.gz$'; then
-            cd "$compile_dir"
+          cd ${{ env.BD_PROJECT }}/bin/targets/*/*
+          if [ -n "$(ls *.img.gz)" ]; then
             echo "BD_COMPILE=success" >> "$GITHUB_ENV"
             echo "FIRMWARE_PATH=$PWD" >> "$GITHUB_ENV"
             echo "DATE=$(date +"%Y.%m.%d")" >> "$GITHUB_ENV"
@@ -265,6 +264,7 @@ jobs:
             echo "===========编译成功,准备上传==========="
             send_message "编译成功,准备上传" "编译成功,准备上传"
           else
+            cd $GITHUB_WORKSPACE
             rm -f /home/runner/stop_signal
             echo "===========编译失败,继续暂停==========="
             echo "BD_COMPILE=failure" >> "$GITHUB_ENV"
