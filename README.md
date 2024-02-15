@@ -23,9 +23,9 @@ Openvpn
 
 ## Fork 本项目  ==>  Actions  ==>  选择项目  ==>  Run Workflow
 
-[![LEDE_x86_64](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml)
-[![iStoreOS_x86_64_22.03](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml)
-[![immortalwrt_x86_64_23.05](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml)
+|[![LEDE_x86_64](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml)|
+[![iStoreOS_x86_64_22.03](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml)|
+[![immortalwrt_x86_64_23.05](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml)|
   
    
 ---
