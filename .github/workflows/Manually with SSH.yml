@@ -250,24 +250,26 @@ jobs:
         
         # 加载编译结果检查功能
         check_compile() {
-          if ls $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/ | grep -q '\.img\.gz$'; then
-            cd $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/
-            echo "BD_COMPILE=success" >> $GITHUB_ENV
-            echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
-            echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-            echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
-            uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-            echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
+          compile_dir="$GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/bin/targets/*/*/"          
+          if ls "$compile_dir" | grep -q '\.img\.gz$'; then
+            cd "$compile_dir"
+            echo "BD_COMPILE=success" >> "$GITHUB_ENV"
+            echo "FIRMWARE_PATH=$PWD" >> "$GITHUB_ENV"
+            echo "DATE=$(date +"%Y.%m.%d")" >> "$GITHUB_ENV"
+            KERNEL=$(cat *.manifest | awk '/^kernel/ {print $2}' | tr -d ' ')
+            echo "KERNEL=$KERNEL" >> "$GITHUB_ENV"
+            Uppercase_String=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
+            echo "Uppercase_String=$Uppercase_String" >> "$GITHUB_ENV"        
             tar -czvf packages.tar.gz packages
-            rm -rf packages
+            rm -rf packages        
             echo "===========编译成功,准备上传==========="
             send_message "编译成功,准备上传" "编译成功,准备上传"
-            break
           else
             rm -f /home/runner/stop_signal
             echo "===========编译失败,继续暂停==========="
-            echo "BD_COMPILE=failure" >> $GITHUB_ENV
+            echo "BD_COMPILE=failure" >> "$GITHUB_ENV"
             send_message "编译失败,继续暂停" "编译失败,继续暂停"
+            return 1  # 返回非零值表示编译失败
           fi
         }
 
@@ -287,7 +289,7 @@ jobs:
             count=$((count + 1))
           done
           echo -ne "\033[0K已过时间：$((count / 60))分钟$((count % 60))秒. \r"
-          check_compile
+          check_compile && break
         done
 
         # 处理编译失败
