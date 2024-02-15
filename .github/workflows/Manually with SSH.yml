@@ -3,13 +3,24 @@ name: Manually with SSH
 on: 
   repository_dispatch:
   workflow_dispatch:
+    inputs:
+      build_branch:
+        description: "选择要编译的目标:"
+        required: false
+        default: "lede"
+        type: choice
+        options:
+          - lede_x86_64_master
+          - immortalwrt_x86_64_23.05
+          - istoreos_x86_64_22.03
+          - 纯手动环境配置
 
 env:
-  BD_PROJECT: 'istoreos'       #项目名称
-  BD_TARGET: 'x86_64'        #编译目标
-  REPO_URL: 'https://github.com/istoreos/istoreos'  #项目地址
-  REPO_BRANCH: 'istoreos-22.03'  #项目分支
-  TARGET_PLATFORM: 'amd64'  #平台架构(amd64/arm64)
+  # BD_PROJECT: 'istoreos'       #项目名称
+  # BD_TARGET: 'x86_64'        #编译目标
+  # REPO_URL: 'https://github.com/istoreos/istoreos'  #项目地址
+  # REPO_BRANCH: 'istoreos-22.03'  #项目分支
+  # TARGET_PLATFORM: 'amd64'  #平台架构(amd64/arm64)
   SSH_DEBUG: 'true'  #是否开启SSH功能(true/false)
   SSH_TIME: '340'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
   CACHE_CCACHE: 'false'    #是否开启ccache功能(true/false)
@@ -58,11 +69,45 @@ jobs:
         sudo -E apt clean
         sudo -E timedatectl set-timezone "Asia/Shanghai"
 
+    - name: Environment Customization
+      run: |
+        # 在这里可以根据选择的 build_branch 进行相应的环境设置
+        if [ "${{ github.event.inputs.build_branch }}" == "lede_x86_64_master" ]; then
+          # 执行针对 lede_x86_64_master 的环境设置操作
+          echo "BD_Custom=false" >> $GITHUB_ENV
+          echo "BD_PROJECT=lede" >> $GITHUB_ENV
+          echo "BD_TARGET=x86_64" >> $GITHUB_ENV
+          echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
+          echo "REPO_BRANCH=master" >> $GITHUB_ENV
+          echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
+        elif [ "${{ github.event.inputs.build_branch }}" == "immortalwrt_x86_64_23.05" ]; then
+          # 执行针对 immortalwrt_x86_64_23.05 的环境设置操作
+          echo "BD_Custom=false" >> $GITHUB_ENV
+          echo "BD_PROJECT=immortalwrt" >> $GITHUB_ENV
+          echo "BD_TARGET=x86_64" >> $GITHUB_ENV
+          echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
+          echo "REPO_BRANCH=openwrt-23.05" >> $GITHUB_ENV
+          echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
+        elif [ "${{ github.event.inputs.build_branch }}" == "istoreos_x86_64_22.03" ]; then
+          # 执行针对 istoreos_x86_64_22.03 的环境设置操作
+          echo "BD_Custom=false" >> $GITHUB_ENV
+          echo "BD_PROJECT=istoreos" >> $GITHUB_ENV
+          echo "BD_TARGET=x86_64" >> $GITHUB_ENV
+          echo "REPO_URL=https://github.com/istoreos/istoreos" >> $GITHUB_ENV
+          echo "REPO_BRANCH=istoreos-22.03" >> $GITHUB_ENV
+          echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
+        else
+          # 执行针对纯手动环境配置操作
+          echo "BD_Custom=true" >> $GITHUB_ENV
+        fi
+
     - name: Clone source code
+      if: ${{ env.BD_Custom }} != 'true'
       run: |
         git clone --depth 1 ${{ env.REPO_URL }} -b ${{ env.REPO_BRANCH }} ${{ env.BD_PROJECT }}
 
     - name: Free up disk space
+      if: ${{ env.BD_Custom }} != 'true'
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -75,6 +120,7 @@ jobs:
         echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
     - name: Cache
+      if: ${{ env.BD_Custom }} != 'true'
       uses: HiGarfield/cachewrtbuild@main
       with:
         ccache: ${{ env.CACHE_CCACHE }}
@@ -83,6 +129,7 @@ jobs:
         prefix: ${{ github.workspace }}/${{ env.BD_PROJECT }}
         
     - name: Update & Install feeds
+      if: ${{ env.BD_Custom }} != 'true'
       working-directory: ./${{ env.BD_PROJECT }}
       run: |
         mv $GITHUB_WORKSPACE/feeds/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }} $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/feeds.conf
@@ -94,6 +141,7 @@ jobs:
         $GITHUB_WORKSPACE/customize/preset-clash-core.sh ${{ env.TARGET_PLATFORM }}
         
     - name: "Configuration Customization - Build_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}"
+      if: ${{ env.BD_Custom }} != 'true'
       env:
         CONFIG_FILE: './config/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.config'
       run: |
@@ -296,7 +344,7 @@ jobs:
       with:
         name: ${{ env.BD_PROJECT }}-firmware-${{ env.BD_TARGET }}-${{ env.DATE }}
         path: ${{ env.FIRMWARE_PATH }} 
-        retention-days: 2
+        retention-days: 3
 
     - name: Check Disk
       continue-on-error: true
