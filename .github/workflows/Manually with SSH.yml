@@ -102,12 +102,12 @@ jobs:
         fi
 
     - name: Clone source code
-      if: ${{ env.BD_Custom }} != 'true'
+      if: env.BD_Custom != 'true'
       run: |
         git clone --depth 1 ${{ env.REPO_URL }} -b ${{ env.REPO_BRANCH }} ${{ env.BD_PROJECT }}
 
     - name: Free up disk space
-      if: ${{ env.BD_Custom }} != 'true'
+      if: env.BD_Custom != 'true'
       env:
         DEBIAN_FRONTEND: noninteractive
       run: |
@@ -120,7 +120,7 @@ jobs:
         echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
 
     - name: Cache
-      if: ${{ env.BD_Custom }} != 'true'
+      if: env.BD_Custom != 'true'
       uses: HiGarfield/cachewrtbuild@main
       with:
         ccache: ${{ env.CACHE_CCACHE }}
@@ -129,7 +129,7 @@ jobs:
         prefix: ${{ github.workspace }}/${{ env.BD_PROJECT }}
         
     - name: Update & Install feeds
-      if: ${{ env.BD_Custom }} != 'true'
+      if: env.BD_Custom != 'true'
       working-directory: ./${{ env.BD_PROJECT }}
       run: |
         mv $GITHUB_WORKSPACE/feeds/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }} $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/feeds.conf
@@ -141,7 +141,7 @@ jobs:
         $GITHUB_WORKSPACE/customize/preset-clash-core.sh ${{ env.TARGET_PLATFORM }}
         
     - name: "Configuration Customization - Build_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}"
-      if: ${{ env.BD_Custom }} != 'true'
+      if: env.BD_Custom != 'true'
       env:
         CONFIG_FILE: './config/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.config'
       run: |
