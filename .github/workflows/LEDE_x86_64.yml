@@ -302,7 +302,7 @@ jobs:
         echo "====================暂停工作流===================="
         echo "==========可使用 gogogo 命令提前继续工作流=========="
         if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
-          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
+          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会通过 爱语飞飞 或者 Server酱 进行通知"
         fi
 
         # 倒计时,初始化内部计数器，用于控制循环次数

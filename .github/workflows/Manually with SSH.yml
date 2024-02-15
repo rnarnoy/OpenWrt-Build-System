@@ -100,10 +100,13 @@ jobs:
           echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
           echo "针对 istoreos_x86_64_22.03 的环境设置完成"      
         else
-          # 执行针对纯手动环境配置操作
+          # 执行针对手动克隆源码操作
           echo "BD_Custom=true" >> $GITHUB_ENV
           echo "BD_PROJECT=*" >> $GITHUB_ENV
-          echo "针对 手动克隆源码 的环境设置完成,一次只能克隆一个项目"   
+          echo "针对 手动克隆源码 的环境设置完成"
+          echo "务必将源码克隆在$GITHUB_WORKSPACE目录下,否则编译完成后上传将出错!"
+          echo "务必将源码克隆在$GITHUB_WORKSPACE目录下,否则编译完成后上传将出错!"
+          echo "务必将源码克隆在$GITHUB_WORKSPACE目录下,否则编译完成后上传将出错!"
         fi
 
     - name: Clone source code
@@ -256,12 +259,6 @@ jobs:
             echo "BD_COMPILE=success" >> $GITHUB_ENV
             echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
             echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
-            KERNEL=$(cat *.manifest | awk '/^kernel/ {print $2}' | tr -d ' ')
-            echo "KERNEL=$KERNEL" >> $GITHUB_ENV
-            Uppercase_String=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
-            echo "Uppercase_String=$Uppercase_String" >> $GITHUB_ENV        
-            tar -czvf packages.tar.gz packages
-            rm -rf packages        
             echo "===========编译成功,准备上传==========="
             send_message "编译成功,准备上传" "编译成功,准备上传"
           else
@@ -277,11 +274,11 @@ jobs:
         echo "====================暂停工作流===================="
         echo "==========可使用 gogogo 命令提前继续工作流=========="
         if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
-          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会微信通知"
+          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会通过 爱语飞飞 或者 Server酱 进行通知"
         fi
 
         # 倒计时,初始化内部计数器，用于控制循环次数
-        count=0 
+        count=0
         while [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
           # 每秒钟增加内部计数器
           while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ]; do
@@ -298,40 +295,6 @@ jobs:
           exit 1
         fi
 
-    # - name: Upload Firmware To Release
-    #   if: env.BD_COMPILE == 'success' && env.UPLOAD_RELEASE == 'true'
-    #   uses: ncipollo/release-action@main
-    #   with:
-    #     name: ${{ env.DATE }}_${{ env.Uppercase_String }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
-    #     allowUpdates: true
-    #     tag: ${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
-    #     token: ${{ secrets.GITHUB_TOKEN }}
-    #     artifacts: ${{ env.FIRMWARE_PATH }}/*
-    #     body: |
-    #       ===Firmware ${{ env.Uppercase_String }} for ${{ env.BD_TARGET }}===
-    #       ### 📒 固件信息
-    #       - 💻 平台架构: ${{ env.BD_TARGET }}
-    #       - ⚽ 固件源码: ${{ env.REPO_URL }}
-    #       - 💝 源码分支: ${{ env.REPO_BRANCH }}
-    #       - 🚀 内核版本: ${{ env.KERNEL }}
-    #       - 🌐 默认地址: 10.1.1.254
-    #       - 🔑 默认密码: 空       
-
-    #       ### 📒 插件列表:
-    #       ```
-    #       ShadowSocksR Plus+
-    #       PassWall
-    #       Openclash
-    #       Netdata
-    #       Autotimeset
-    #       AdGuard Home
-    #       Mosdns
-    #       DDNS-go
-    #       ZeroTier
-    #       Openvpn
-    #       应用中心(iStore)
-    #       ```
-
     - name: Organize files
       if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true'
       working-directory: ${{ env.FIRMWARE_PATH }}
@@ -339,7 +302,7 @@ jobs:
         echo "=============生成文件列表============="
         ls -lh | awk '{print $9, $5}'
         echo "==============清理文件中============="
-        rm -rf *kernel.bin *rootfs* *.json *.tar.zst
+        rm -rf *kernel.bin *rootfs* *.json *.tar.zst 
         sleep 2
         echo "=============上传文件列表============="
         ls -lh | awk '{print $9, $5}'
@@ -347,9 +310,17 @@ jobs:
 
     - name : Upload artifact
       uses: actions/upload-artifact@main
-      if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true'
+      if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true' && env.BD_Custom != 'true'
       with:
         name: ${{ env.BD_PROJECT }}-firmware-${{ env.BD_TARGET }}-${{ env.DATE }}
+        path: ${{ env.FIRMWARE_PATH }} 
+        retention-days: 3
+
+    - name : Upload artifact for custom
+      uses: actions/upload-artifact@main
+      if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true' && env.BD_Custom == 'true'
+      with:
+        name: Custom-firmware-${{ env.DATE }}
         path: ${{ env.FIRMWARE_PATH }} 
         retention-days: 3
 
