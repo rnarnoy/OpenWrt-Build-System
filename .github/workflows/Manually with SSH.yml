@@ -264,7 +264,6 @@ jobs:
             echo "===========编译成功,准备上传==========="
             send_message "编译成功,准备上传" "编译成功,准备上传"
           else
-            cd $GITHUB_WORKSPACE
             rm -f /home/runner/stop_signal
             echo "===========编译失败,继续暂停==========="
             echo "BD_COMPILE=failure" >> "$GITHUB_ENV"
@@ -289,6 +288,7 @@ jobs:
             count=$((count + 1))
           done
           echo -ne "\033[0K已过时间：$((count / 60))分钟$((count % 60))秒. \r"
+          cd $GITHUB_WORKSPACE
           check_compile && break
         done
 
