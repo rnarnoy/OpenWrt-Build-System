@@ -7,7 +7,7 @@ on:
       build_branch:
         description: "选择要编译的目标:"
         required: false
-        default: "lede"
+        default: "lede_x86_64_master"
         type: choice
         options:
           - lede_x86_64_master
@@ -80,6 +80,7 @@ jobs:
           echo "REPO_URL=https://github.com/coolsnowwolf/lede" >> $GITHUB_ENV
           echo "REPO_BRANCH=master" >> $GITHUB_ENV
           echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
+          echo "针对 lede_x86_64_master 的环境设置完成"
         elif [ "${{ github.event.inputs.build_branch }}" == "immortalwrt_x86_64_23.05" ]; then
           # 执行针对 immortalwrt_x86_64_23.05 的环境设置操作
           echo "BD_Custom=false" >> $GITHUB_ENV
@@ -88,6 +89,7 @@ jobs:
           echo "REPO_URL=https://github.com/immortalwrt/immortalwrt" >> $GITHUB_ENV
           echo "REPO_BRANCH=openwrt-23.05" >> $GITHUB_ENV
           echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
+          echo "针对 immortalwrt_x86_64_23.05 的环境设置完成"
         elif [ "${{ github.event.inputs.build_branch }}" == "istoreos_x86_64_22.03" ]; then
           # 执行针对 istoreos_x86_64_22.03 的环境设置操作
           echo "BD_Custom=false" >> $GITHUB_ENV
@@ -96,9 +98,11 @@ jobs:
           echo "REPO_URL=https://github.com/istoreos/istoreos" >> $GITHUB_ENV
           echo "REPO_BRANCH=istoreos-22.03" >> $GITHUB_ENV
           echo "TARGET_PLATFORM=amd64" >> $GITHUB_ENV
+          echo "针对 istoreos_x86_64_22.03 的环境设置完成"      
         else
           # 执行针对纯手动环境配置操作
           echo "BD_Custom=true" >> $GITHUB_ENV
+          echo "针对 纯手动环境配置 请自行克隆源码及配置文件"      
         fi
 
     - name: Clone source code
@@ -140,7 +144,7 @@ jobs:
         $GITHUB_WORKSPACE/customize/preset-adguard-core.sh ${{ env.TARGET_PLATFORM }}
         $GITHUB_WORKSPACE/customize/preset-clash-core.sh ${{ env.TARGET_PLATFORM }}
         
-    - name: "Configuration Customization - Build_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}"
+    - name: "Configuration Customization"
       if: env.BD_Custom != 'true'
       env:
         CONFIG_FILE: './config/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.config'
