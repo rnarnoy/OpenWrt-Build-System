@@ -31,7 +31,7 @@ Openvpn
 ---
 
 ## >>>[![Manually with SSH](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml)<<<
-#####  可用于修改编译内容或手动编译,~~不同项目请自行修改环境变量~~
+#####  可用于修改编译内容或手动编译
   
    
 
