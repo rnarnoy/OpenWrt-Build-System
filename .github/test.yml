@@ -1,0 +1,408 @@
+name: test
+
+on: 
+  workflow_dispatch:
+    inputs:
+      build_branch:
+        description: "是否开启SSH调试功能:"
+        required: false
+        default: "关闭"
+        type: choice
+        options:
+          - 关闭
+          - 开启
+
+  schedule:
+    - cron: 0 0 1,15 * *
+
+env:
+  BD_PROJECT: 'lede'       #项目名称
+  BD_TARGET: 'x86_64'        #编译目标
+  REPO_URL: 'https://github.com/coolsnowwolf/lede'  #项目地址
+  REPO_BRANCH: 'master'  #项目分支
+  TARGET_PLATFORM: 'amd64'  #平台架构(amd64/arm64)
+  SSH_DEBUG: 'false' #是否开启SSH功能(true/false)
+  SSH_TIME: '30'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
+  SSH_TIME2: '340'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
+  CACHE_CCACHE: 'false'    #是否开启ccache功能(true/false)
+  CACHE_CLEAN: 'false'     #是否清除缓存(true/false)
+  UPLOAD_ARTIFACT: 'false'   #是否上传到ARTIFACT(true/false)
+  UPLOAD_RELEASE: 'true'    #是否上传到RELEASE(true/false)
+
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: write
+    
+    inputs:
+      your_additional_input:
+        description: "只有在开启SSH调试功能时才输入的值:"
+        required: false
+        type: string
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - name: Additional step with conditional input
+      if: ${{ github.event.inputs.build_branch == '开启' }}
+      run: |
+        # Use the input only when build_branch is '开启'
+        echo "Your additional input value: ${{ github.event.inputs.your_additional_input }}"
+
+    - name: Check Server Performance
+      run: |
+        echo "警告⚠"
+        echo "分配的服务器性能有限，若选择的插件过多，务必注意CPU性能！"
+        echo -e "已知CPU型号(降序): 7763，8370C，8272CL，8171M，E5-2673\n"
+        echo "--------------------------CPU信息--------------------------"
+        echo "CPU物理数量: $(cat /proc/cpuinfo | grep "physical id" | sort | uniq | wc -l)"
+        echo "CPU核心数量: $(nproc)"
+        echo -e "CPU型号信息:$(cat /proc/cpuinfo | grep -m1 name | awk -F: '{print $2}')\n"
+        echo "--------------------------内存信息--------------------------"
+        echo "已安装内存详细信息:"
+        echo -e "$(sudo lshw -short -C memory | grep GiB)\n"
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
+
+    - name: Initialization environment
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        docker rmi `docker images -q`
+        sudo -E rm -rf /usr/share/dotnet /etc/mysql /etc/php /etc/apt/sources.list.d /usr/local/lib/android
+        sudo -E apt-mark hold grub-efi-amd64-signed
+        sudo -E apt update
+        sudo -E apt -y purge azure-cli* docker* ghc* zulu* llvm* firefox google* dotnet* powershell* openjdk* mysql* php* mongodb* dotnet* snap*
+        sudo -E apt -y full-upgrade
+        sudo -E apt-get -qq install btop build-essential clang flex g++ gawk gcc-multilib gettext git libncurses5-dev libssl-dev python3-distutils python3-pyelftools python3-setuptools libpython3-dev rsync unzip zlib1g-dev swig aria2 jq subversion qemu-utils ccache rename libelf-dev device-tree-compiler libgnutls28-dev coccinelle libgmp3-dev libmpc-dev libfuse-dev ack antlr3 asciidoc autoconf automake autopoint binutils bison build-essential bzip2 ccache cmake cpio curl device-tree-compiler ecj fastjar flex gawk gettext gcc-multilib g++-multilib git gnutls-dev gperf haveged help2man intltool lib32gcc-s1 libc6-dev-i386 libc6-dev libelf-dev libglib2.0-dev libgmp3-dev libltdl-dev libmpc-dev libmpfr-dev libncurses5-dev libncursesw5 libncursesw5-dev libreadline-dev libssl-dev libtool lld llvm lrzsz mkisofs msmtp nano ninja-build p7zip p7zip-full patch pkgconf python2.7 python3 python3-pip python3-ply python3-pyelftools qemu-utils re2c rsync scons squashfs-tools subversion swig texinfo uglifyjs upx-ucl unzip vim wget xmlto xxd zlib1g-dev
+        sudo -E systemctl daemon-reload
+        sudo -E apt -y autoremove --purge
+        sudo -E apt clean
+        sudo -E timedatectl set-timezone "Asia/Shanghai"
+
+    - name: Clone source code
+      run: |
+        git clone --depth 1 ${{ env.REPO_URL }} -b ${{ env.REPO_BRANCH }} ${{ env.BD_PROJECT }}
+       
+    - name: Free up disk space
+      env:
+        DEBIAN_FRONTEND: noninteractive
+      run: |
+        sudo mkdir -p -m 777 /mnt/${{ env.BD_PROJECT }}/dl /mnt/${{ env.BD_PROJECT }}/bin /mnt/${{ env.BD_PROJECT }}/staging_dir /mnt/${{ env.BD_PROJECT }}/build_dir
+        ln -sf /mnt/${{ env.BD_PROJECT }}/dl ${{ env.BD_PROJECT }}/dl
+        ln -sf /mnt/${{ env.BD_PROJECT }}/bin ${{ env.BD_PROJECT }}/bin
+        ln -sf /mnt/${{ env.BD_PROJECT }}/staging_dir ${{ env.BD_PROJECT }}/staging_dir
+        ln -sf /mnt/${{ env.BD_PROJECT }}/build_dir ${{ env.BD_PROJECT }}/build_dir
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
+
+    - name: Cache
+      uses: HiGarfield/cachewrtbuild@main
+      with:
+        ccache: ${{ env.CACHE_CCACHE }}
+        mixkey: ${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
+        clean: ${{ env.CACHE_CLEAN }}
+        prefix: ${{ github.workspace }}/${{ env.BD_PROJECT }}
+        
+    - name: Update & Install feeds
+      working-directory: ./${{ env.BD_PROJECT }}
+      run: |
+        mv $GITHUB_WORKSPACE/feeds/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }} $GITHUB_WORKSPACE/${{ env.BD_PROJECT }}/feeds.conf
+        ./scripts/feeds update -a
+        ./scripts/feeds install -a
+        chmod +x $GITHUB_WORKSPACE/customize/*.sh
+        $GITHUB_WORKSPACE/customize/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.sh
+        $GITHUB_WORKSPACE/customize/preset-adguard-core.sh ${{ env.TARGET_PLATFORM }}
+        $GITHUB_WORKSPACE/customize/preset-clash-core.sh ${{ env.TARGET_PLATFORM }}
+
+    - name: "Configuration Customization - Build_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}"
+      env:
+        CONFIG_FILE: './config/${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}.config'
+      run: |
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE ${{ env.BD_PROJECT }}/.config
+        cd ${{ env.BD_PROJECT }}
+        sudo echo "cd $PWD" >> /home/runner/.bashrc
+        [ "${{ env.CACHE_CCACHE }}" == 'true' ] && echo -e 'CONFIG_CCACHE=y' >> .config
+        make defconfig
+
+    - name: Setup ssh for debug 
+      if: env.SSH_DEBUG == 'true'
+      continue-on-error: true
+      run: |
+        # 允许root登录并设置root密码
+        echo "PermitRootLogin yes" | sudo tee -a /etc/ssh/sshd_config 
+        if [ -n "${{ secrets.SSH_PW }}" ]; then
+          echo "root:${{ secrets.SSH_PW }}" | sudo chpasswd
+        else
+          echo "root:123" | sudo chpasswd
+        fi
+    
+        # 重启SSH服务
+        sudo service sshd restart
+    
+        # 配置和启动frpc
+        if [ -n "${{ secrets.FRPC_CONFIG }}" ]; then
+          # 使用提供的frpc配置
+          echo "${{ secrets.FRPC_CONFIG }}" > ./frpc.ini
+          chmod +x ./frpc && ./frpc -c ./frpc.ini > ./frpc.log 2>&1 &
+          sleep 5
+          if grep -q "start proxy success" ./frpc.log; then
+            echo "================frpc启动成功!================"
+            echo "=========检测为自定义配置,请自行连接SSH========="
+            echo "SSH_SETUP=success" >> $GITHUB_ENV
+          else
+            echo "警告:尝试启动frpc失败。请重新配置FRPC_CONFIG字段"
+            echo "==================继续工作流==================="
+            echo "SSH_SETUP=failure" >> $GITHUB_ENV
+          fi
+        else
+          # 生成随机端口并配置frpc
+          max_attempts=10
+          attempts=0
+
+          while [ $attempts -lt $max_attempts ]; do
+            random_port=$(shuf -i 10001-50000 -n 1)
+            cp frpc.ini.example frpc.ini
+            sed -i "s/\[ssh2action\]/\[ssh2action$random_port\]/g" frpc.ini
+            sed -i "s/remote_port = 22222/remote_port = $random_port/g" frpc.ini
+            chmod +x ./frpc && ./frpc -c ./frpc.ini > ./frpc.log 2>&1 &
+            sleep 5
+            # 检查frpc启动错误
+            if grep -q "start proxy success" ./frpc.log; then
+              echo "============frpc启动成功!============"
+              echo "==========以下是SSH连接命令==========="
+              echo "ssh root@$(grep -E 'server_addr\s*=' frpc.ini | cut -d'=' -f2 | tr -d '[:space:]') -p $random_port"
+              echo "===================================="
+              echo "SSH_SETUP=success" >> $GITHUB_ENV
+              break
+            else
+              echo "错误:frpc启动失败!重试中..."
+              pkill frpc
+              attempts=$((attempts+1))
+            fi
+          done
+
+          if [ $attempts -eq $max_attempts ]; then
+            echo "警告:尝试启动frpc $max_attempts 次仍然失败。请自行配置FRPC_CONFIG字段"
+            echo "======================继续工作流======================="
+            echo "SSH_SETUP=failure" >> $GITHUB_ENV
+          fi
+        fi     
+
+    - name: Pause workflow for custom
+      if: env.SSH_DEBUG == 'true' && env.SSH_SETUP == 'success'
+      run: |
+        # 加载gogogo命令
+        source $GITHUB_WORKSPACE/customize/diy/gogogo.sh
+        echo -n -e "===================暂停工作流==================="      # 倒计时循环
+        count=0 
+        while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
+          sleep 1
+          count=$((count + 1))
+        done
+        echo "已过时间：$((count / 60))分钟$((count % 60))秒"
+        # 循环结束后删除文件
+        sudo rm -f /home/runner/stop_signal
+                
+    - name: Download package
+      working-directory: ./${{ env.BD_PROJECT }}
+      run: |
+        make download -j$(nproc)
+        find dl -size -1024c -exec ls -l {} \;
+        find dl -size -1024c -exec rm -f {} \;
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
+
+    - name: Build firmware
+      working-directory: ./${{ env.BD_PROJECT }}
+      run: |
+        echo -e "$(nproc) thread build."
+        make -j$(nproc) || make -j1 V=s | tee build.log
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT 
+
+    - name: Check compile
+      run: |
+        # 加载消息通知功能
+        send_message() {
+          if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
+            # 发送消息到 IYUU 接口
+            curl -X POST \
+            "https://iyuu.cn/${{ secrets.IYUU_TOKEN }}.send" \
+            -H 'Content-Type: application/json' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过IYUU接口发送通知======="
+          fi
+      
+          if [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+            # 发送消息到 Server酱
+            curl -X POST \
+            "https://sc.ftqq.com/${{ secrets.SERVERCHAN_SCKEY }}.send" \
+            -H 'Content-Type: application/json;charset=utf-8' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过Server酱发送通知======="
+          fi
+        }
+
+        cd ${{ env.BD_PROJECT }}/bin/targets/*/*
+        if [ -n "$(ls *.img.gz)" ]; then
+          echo "BD_COMPILE=success" >> $GITHUB_ENV
+          echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
+          echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+          echo "KERNEL=$(cat *.manifest | grep ^kernel | cut -d- -f2 | tr -d ' ')" >> $GITHUB_ENV
+          uppercase_string=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
+          echo "Uppercase_String=$uppercase_string" >> $GITHUB_ENV
+          tar -czvf packages.tar.gz packages
+          rm -rf packages
+          echo "===========编译成功,准备上传==========="
+        else
+          if [ "${{ env.SSH_SETUP }}" == 'success' ]; then
+            echo "BD_COMPILE=standby" >> $GITHUB_ENV
+            echo "===========编译失败,暂停工作流==========="
+            send_message "编译失败" "编译失败,已暂停工作流,请使用SSH登录调试"
+          else
+            echo "===========编译失败,结束工作流==========="
+            exit 1
+          fi        
+        fi
+
+    - name: Pause workflow for debug
+      if: env.BD_COMPILE == 'standby'
+      run: |
+        # 加载gogogo命令
+        source $GITHUB_WORKSPACE/customize/diy/gogogo.sh
+
+        # 加载消息通知功能
+        send_message() {
+          if [ -n "${{ secrets.IYUU_TOKEN }}" ]; then
+            # 发送消息到 IYUU 接口
+            curl -X POST \
+            "https://iyuu.cn/${{ secrets.IYUU_TOKEN }}.send" \
+            -H 'Content-Type: application/json' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过IYUU接口发送通知======="
+          fi
+      
+          if [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+            # 发送消息到 Server酱
+            curl -X POST \
+            "https://sc.ftqq.com/${{ secrets.SERVERCHAN_SCKEY }}.send" \
+            -H 'Content-Type: application/json;charset=utf-8' \
+            -d '{"text": "'"${1}"'", "desp": "'"${2}"'"}' > /dev/null 2>&1
+            echo "=======已通过Server酱发送通知======="
+          fi
+        }
+        
+        # 加载编译结果检查功能
+        check_compile() {
+          cd ${{ env.BD_PROJECT }}/bin/targets/*/*
+          if [ -n "$(ls *.img.gz)" ]; then
+            echo "BD_COMPILE=success" >> $GITHUB_ENV
+            echo "FIRMWARE_PATH=$PWD" >> $GITHUB_ENV
+            echo "DATE=$(date +"%Y.%m.%d")" >> $GITHUB_ENV
+            KERNEL=$(cat *.manifest | awk '/^kernel/ {print $2}' | tr -d ' ')
+            echo "KERNEL=$KERNEL" >> $GITHUB_ENV
+            Uppercase_String=$(echo "${{ env.BD_PROJECT }}" | tr '[:lower:]' '[:upper:]')
+            echo "Uppercase_String=$Uppercase_String" >> $GITHUB_ENV
+            tar -czvf packages.tar.gz packages
+            rm -rf packages
+            echo "===========编译成功,准备上传==========="
+            send_message "编译成功,准备上传" "编译成功,准备上传"
+          else
+            rm -f /home/runner/stop_signal
+            echo "===========编译失败,继续暂停==========="
+            echo "BD_COMPILE=failure" >> $GITHUB_ENV
+            send_message "编译失败,继续暂停" "编译失败,继续暂停"
+            return 1  # 返回非零值表示编译失败
+          fi
+        }
+
+        # 输出消息
+        echo "====================暂停工作流===================="
+        echo "==========可使用 gogogo 命令提前继续工作流=========="
+        if [ -n "${{ secrets.IYUU_TOKEN }}" ] || [ -n "${{ secrets.SERVERCHAN_SCKEY }}" ]; then
+          echo "推荐make -j$(nproc) ; gogogo 编译，执行完成会通过 爱语飞飞 或者 Server酱 进行通知"
+        fi
+
+        # 倒计时,初始化内部计数器，用于控制循环次数
+        count=0 
+        while [ $count -lt $((60 * ${{ env.SSH_TIME2 }})) ] ; do
+          # 每秒钟增加内部计数器
+          while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME2 }})) ]; do
+            sleep 1
+            count=$((count + 1))
+          done
+          echo -ne "\033[0K已过时间：$((count / 60))分钟$((count % 60))秒. \r"
+          cd $GITHUB_WORKSPACE
+          check_compile && break
+        done
+
+        # 处理编译失败
+        if [ "${{ env.BD_COMPILE }}" == 'failure' ]; then
+          exit 1
+        fi
+
+
+    - name: Upload Firmware To Release
+      if: env.BD_COMPILE == 'success' && env.UPLOAD_RELEASE == 'true'
+      uses: ncipollo/release-action@main
+      with:
+        name: ${{ env.DATE }}_${{ env.Uppercase_String }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
+        allowUpdates: true
+        tag: ${{ env.DATE }}_${{ env.BD_PROJECT }}_${{ env.BD_TARGET }}_${{ env.REPO_BRANCH }}
+        token: ${{ secrets.GITHUB_TOKEN }}
+        artifacts: ${{ env.FIRMWARE_PATH }}/*
+        body: |
+          ===Firmware ${{ env.Uppercase_String }} for ${{ env.BD_TARGET }}===
+          ### 📒 固件信息
+          - 💻 平台架构: ${{ env.BD_TARGET }}
+          - ⚽ 固件源码: ${{ env.REPO_URL }}
+          - 💝 源码分支: ${{ env.REPO_BRANCH }}
+          - 🚀 内核版本: ${{ env.KERNEL }}
+          - 🌐 默认地址: 10.1.1.254
+          - 🔑 默认密码: 空                
+
+          ### 📒 插件列表:
+          ```
+          ShadowSocksR Plus+
+          PassWall
+          Openclash
+          Netdata
+          Autotimeset
+          AdGuardHome
+          Mosdns
+          DDNS-go
+          ZeroTier
+          Openvpn
+          应用中心(iStore)
+          ```
+
+    - name: Organize files
+      if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true'
+      working-directory: ${{ env.FIRMWARE_PATH }}
+      run: |
+        echo "=============生成文件列表============="
+        ls -lh | awk '{print $9, $5}'
+        echo "==============清理文件中============="
+        rm -rf *kernel.bin *rootfs* *.json *.tar.zst
+        sleep 2
+        echo "=============上传文件列表============="
+        ls -lh | awk '{print $9, $5}'
+        echo "===================================="
+
+    - name : Upload artifact
+      uses: actions/upload-artifact@main
+      if: env.BD_COMPILE == 'success' && env.UPLOAD_ARTIFACT == 'true'
+      with:
+        name: ${{ env.BD_PROJECT }}-firmware-${{ env.BD_TARGET }}-${{ env.DATE }}
+        path: ${{ env.FIRMWARE_PATH }} 
+        retention-days: 2
+
+    - name: Check Disk
+      continue-on-error: true
+      run: |
+        echo "--------------------------硬盘信息--------------------------"
+        echo "硬盘数量: $(ls /dev/sd* | grep -v [1-9] | wc -l)" && df -hT
