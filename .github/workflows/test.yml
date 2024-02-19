@@ -92,10 +92,12 @@ jobs:
           # 执行针对 开启ssh调试功能 的环境设置操作
           echo "SSH_DEBUG=true" >> $GITHUB_ENV
           echo "SSH_TIME=${{ github.event.inputs.ssh_time1 }}" >> $GITHUB_ENV
-          echo "SSH_TIME=${{ github.event.inputs.ssh_time2 }}" >> $GITHUB_ENV
-          echo "=================已开启SSH调试功能================="
-          echo "设置开始编译前暂停30分钟,若编译报错将会暂停5小时40分钟"
-          echo "==========可使用 gogogo 命令提前继续工作流=========="
+          echo "SSH_TIME2=${{ github.event.inputs.ssh_time2 }}" >> $GITHUB_ENV
+          echo "=====================已开启SSH调试功能====================="
+          echo "设置开始编译前暂停$(((${{ github.event.inputs.ssh_time1 }}) / 60))小时$(((${{ github.event.inputs.ssh_time1 }}) % 60))分钟,若编译报错将会暂停$(((${{ github.event.inputs.ssh_time2 }}) / 60))小时$(((${{ github.event.inputs.ssh_time2 }}) % 60))分钟"
+          echo "==============可使用 gogogo 命令提前继续工作流=============="
+        else
+          echo "SSH_DEBUG=false" >> $GITHUB_ENV
         fi
 
     - name: Clone source code
