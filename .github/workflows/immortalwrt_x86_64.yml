@@ -13,13 +13,13 @@ on:
               - 开启
 
           ssh_time1:
-            description: "设置开始编译前暂停时间,单位分钟:"
+            description: "SSH调试设置:开始编译前暂停时间(分钟):"
             required: false
             default: "30"
             type: string
 
           ssh_time2:
-            description: "设置编译报错后暂停时间,单位分钟:"
+            description: "SSH调试设置:编译报错后暂停时间(分钟):"
             required: false
             default: "340"
             type: string
