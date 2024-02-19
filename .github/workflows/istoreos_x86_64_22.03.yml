@@ -2,6 +2,28 @@ name: iStoreOS_x86_64_22.03
 
 on: 
   workflow_dispatch:
+    inputs:
+          ssh_debug:
+            description: "是否开启SSH调试功能:"
+            required: false
+            default: "关闭"
+            type: choice
+            options:
+              - 关闭
+              - 开启
+
+          ssh_time1:
+            description: "设置开始编译前暂停时间,单位分钟:"
+            required: false
+            default: "30"
+            type: string
+
+          ssh_time2:
+            description: "设置编译报错后暂停时间,单位分钟:"
+            required: false
+            default: "340"
+            type: string
+
   schedule:
     - cron: 0 6 1,15 * *
 
@@ -60,6 +82,22 @@ jobs:
         sudo -E apt -y autoremove --purge
         sudo -E apt clean
         sudo -E timedatectl set-timezone "Asia/Shanghai"
+
+    - name: Environment Customization
+      run: |
+        # 在这里可以根据选择的 ssh_debug 进行相应的环境设置
+        if [ "${{ github.event.inputs.ssh_debug }}" == "开启" ]; then
+          # 执行针对 开启ssh调试功能 的环境设置操作
+          echo "SSH_DEBUG=true" >> $GITHUB_ENV
+          echo "SSH_TIME=${{ github.event.inputs.ssh_time1 }}" >> $GITHUB_ENV
+          echo "SSH_TIME2=${{ github.event.inputs.ssh_time2 }}" >> $GITHUB_ENV
+          echo "=====================已开启SSH调试功能===================="
+          echo "==设置开始编译前暂停$(((${{ github.event.inputs.ssh_time1 }}) / 60))小时$(((${{ github.event.inputs.ssh_time1 }}) % 60))分钟,若编译报错将会暂停$(((${{ github.event.inputs.ssh_time2 }}) / 60))小时$(((${{ github.event.inputs.ssh_time2 }}) % 60))分钟=="
+          echo "==============可使用 gogogo 命令提前继续工作流============="
+        else
+          echo "=====================未开启SSH调试功能===================="
+          echo "SSH_DEBUG=false" >> $GITHUB_ENV
+        fi
 
     - name: Clone source code
       run: |
@@ -175,7 +213,7 @@ jobs:
       run: |
         # 加载gogogo命令
         source $GITHUB_WORKSPACE/customize/diy/gogogo.sh
-        echo -n -e "===================暂停工作流==================="      # 倒计时循环
+        echo "===================已暂停工作流==================="      # 倒计时循环
         count=0
         while [ ! -f /home/runner/stop_signal ] && [ $count -lt $((60 * ${{ env.SSH_TIME }})) ] ; do
           sleep 1

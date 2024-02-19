@@ -29,28 +29,26 @@ Openvpn
    
 ---
 
-## >>>[![Manually with SSH](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml)<<<
+## [![Manually with SSH](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml)
 #####  可用于修改编译内容或手动编译
   
    
 
 ---
-# 如何使用SSH连接Action
+# 使用SSH连接Action
 
-#### 开启SSH调试功能
-修改.github/workflows/xxx.yml
-```
-env:
-  SSH_DEBUG: 'false'  #false修改为true
-```
-##### 可选项
-```
-SSH_TIME    设置开始编译前暂停时间,单位分钟,可用pkill sleep命令提前继续工作流
-SSH_TIME2  设置编译报错后暂停时间,单位分钟,可用pkill sleep命令提前继续工作流
-```
+#### SSH连接命令
 
+在工作流的Setup ssh for debug步骤中会显示
+```
+============frpc启动成功!===========
+==========以下是SSH连接命令==========
+ssh root@xxx -p xxxx
+```
+密码为SSH_PW定义的密码,不设置则为123
+   
 ---
-#### 自定义选项
+#### 自定义选项(可选)
 ```
 点击仓库的Settings  ==> Actions secrets and variables ==> Actions ==> New repository secret ==> 填写Secret 信息
 ```
@@ -82,17 +80,7 @@ remote_port = 22222
 ##### 若使用公共服务器只需要修改frpc.ini.example中  [common]  部分的内容
    
 ---
-#### SSH连接命令
 
-在工作流的Setup ssh for debug步骤中会显示
-```
-============frpc启动成功!===========
-==========以下是SSH连接命令==========
-ssh root@xxx -p xxxx
-```
-密码为SSH_PW定义的密码,不设置则为123
-   
----
 # 添加新项目
    
 
@@ -114,8 +102,8 @@ ssh root@xxx -p xxxx
 | REPO_BRANCH|  项目分支|
 | TARGET_PLATFORM|  平台架构(amd64/arm64)|
 | SSH_DEBUG| 是否开启SSH功能(true/false)|
-| SSH_TIME|    设置开始编译前暂停时间,可用pkill sleep命令提前继续工作流|
-|SSH_TIME2|   设置编译报错后暂停时间,可用pkill sleep命令提前继续工作流|
+| SSH_TIME|    设置开始编译前暂停时间,可用gogogo命令提前继续工作流|
+|SSH_TIME2|   设置编译报错后暂停时间,可用gogogo命令提前继续工作流|
 | CACHE_CCACHE  |    是否开启ccache缓存功能,不开启则只缓存工具链(true/false)|
 | CACHE_CLEAN  |    是否清除缓存(true/false)|
 | UPLOAD_ARTIFACT|   是否上传到ARTIFACT(true/false)|
