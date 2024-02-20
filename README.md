@@ -52,7 +52,7 @@ ssh root@xxx -p xxxx
 ```
 点击仓库的Settings  ==> Actions secrets and variables ==> Actions ==> New repository secret ==> 填写Secret 信息
 ```
-|Name |Value说明|
+|Name |Secret值说明|
 |----------|--------------------------------------------------|
 |SSH_PW|   用于定义ssh访问的root密码,不设置默认123|
 | FRPC_CONFIG|  用于定义frpc的配置文件,不设置将自动尝试使用公共frp服务器并生成SSH连接命令|
