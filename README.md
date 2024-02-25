@@ -5,6 +5,7 @@
 - 密码: `无`
 - 插件:
 ```
+DockerMan
 ShadowSocksR Plus+
 PassWall
 Openclash
