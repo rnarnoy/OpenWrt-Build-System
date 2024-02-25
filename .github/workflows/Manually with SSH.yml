@@ -15,6 +15,15 @@ on:
           - istoreos_x86_64_22.03
           - 手动克隆源码
 
+      cache_clean:
+        description: "是否清除缓存:"
+        required: false
+        default: "关闭"
+        type: choice
+        options:
+          - 关闭
+          - 开启
+
 env:
   # BD_PROJECT: 'istoreos'       #项目名称
   # BD_TARGET: 'x86_64'        #编译目标
@@ -22,9 +31,9 @@ env:
   # REPO_BRANCH: 'istoreos-22.03'  #项目分支
   # TARGET_PLATFORM: 'amd64'  #平台架构(amd64/arm64)
   SSH_DEBUG: 'true'  #是否开启SSH功能(true/false)
-  SSH_TIME: '340'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
+  SSH_TIME: '350'   #单位分钟,设置暂停工作流时间,可用pkill sleep命令提前继续工作流,整个工作流运行时间不能超过6小时
   CACHE_CCACHE: 'false'    #是否开启ccache功能(true/false)
-  CACHE_CLEAN: 'false'     #是否清除缓存(true/false)
+  # CACHE_CLEAN: 'false'     #是否清除缓存(true/false)
   UPLOAD_ARTIFACT: 'true'   #是否上传到ARTIFACT(true/false)
   UPLOAD_RELEASE: 'false'    #是否上传到RELEASE(true/false)
 
@@ -107,6 +116,14 @@ jobs:
           echo "务必将源码克隆在$GITHUB_WORKSPACE目录下,否则编译完成后上传将出错!"
           echo "务必将源码克隆在$GITHUB_WORKSPACE目录下,否则编译完成后上传将出错!"
           echo "务必将源码克隆在$GITHUB_WORKSPACE目录下,否则编译完成后上传将出错!"
+        fi
+        # 是否清理缓存
+        if [ "${{ github.event.inputs.cache_clean }}" == "开启" ]; then
+          echo "CACHE_CLEAN=true" >> $GITHUB_ENV
+          echo "清理缓存已开启"
+        else
+          echo "CACHE_CLEAN=false" >> $GITHUB_ENV
+          echo "清理缓存已关闭"
         fi
 
     - name: Clone source code
