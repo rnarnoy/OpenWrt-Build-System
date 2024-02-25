@@ -10,8 +10,8 @@ ShadowSocksR Plus+
 PassWall
 Openclash
 Netdata
-Auto time set
-AdGuard Home
+Autotimeset
+AdGuardHome
 Mosdns
 DDNS-go
 ZeroTier
