@@ -64,7 +64,12 @@ sed -i 's/admin\/status/admin\/system/g' package/linpc/luci-app-netdata/luasrc/v
 
 #mosdns
 #git_sparse_clone master https://github.com/kiddin9/openwrt-packages mosdns
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-mosdns
+git_sparse_clone v5 https://github.com/sbwml/luci-app-mosdns luci-app-mosdns
+git_sparse_clone v5 https://github.com/sbwml/luci-app-mosdns mosdns
+rm -rf feeds/packages/utils/v2dat
+rm -rf package/feeds/packages/v2dat
+git_sparse_clone v5 https://github.com/sbwml/luci-app-mosdns v2dat
+
 
 #zerotier
 #git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
@@ -101,11 +106,6 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages v2ray-plugin
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages xray-core
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages xray-plugin
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-neturl
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages mosdns
-
-rm -rf feeds/packages/utils/v2dat
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages v2dat
-
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages redsocks2
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages shadow-tls
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxminddb
