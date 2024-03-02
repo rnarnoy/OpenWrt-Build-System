@@ -23,15 +23,17 @@ Openvpn
 # 使用说明
 
 ## Fork 本项目  ==>  Actions  ==>  选择项目  ==>  Run Workflow
-[![LEDE_x86_64](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml)
-[![iStoreOS_x86_64_22.03](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml)
-[![immortalwrt_x86_64_23.05](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml)
-  
+
+|项目名称|编译目标|编译状态|
+|:--|:--|:--|
+|LEDE|x86_64|[![LEDE_x86_64](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/LEDE_x86_64.yml)|
+|ImmortalWrt|x86_64|[![immortalwrt_x86_64_23.05](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/immortalwrt_x86_64.yml)|
+|iStoreOS|x86_64|[![iStoreOS_x86_64_22.03](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml/badge.svg)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/istoreos_x86_64_22.03.yml)|
    
 ---
 
 ## [![Manually with SSH](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml/badge.svg?branch=master&event=workflow_dispatch)](https://github.com/lmxslpc/OpenWrt-Build-System/actions/workflows/Manually%20with%20SSH.yml)
-#####  可用于修改编译内容或手动编译
+可用于修改编译内容或手动编译
   
    
 

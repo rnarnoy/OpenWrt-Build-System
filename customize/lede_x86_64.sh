@@ -102,6 +102,10 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages xray-core
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages xray-plugin
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-neturl
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages mosdns
+
+rm -rf feeds/packages/utils/v2dat
+git_sparse_clone master https://github.com/kiddin9/openwrt-packages v2dat
+
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages redsocks2
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages shadow-tls
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxminddb
