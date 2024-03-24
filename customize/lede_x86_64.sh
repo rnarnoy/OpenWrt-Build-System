@@ -45,7 +45,7 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-adg
 #科学上网
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-openclash
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-passwall
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ssr-plus
+#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ssr-plus
 #更换插件名称
 #sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
 
