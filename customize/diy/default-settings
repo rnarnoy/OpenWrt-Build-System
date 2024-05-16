@@ -84,7 +84,7 @@ sed -i '/kiddin9/d' /etc/opkg/distfeeds.conf
 
 
 uci set network.lan.proto='static'       # 设置 lan 接口协议为 static
-uci set network.lan.ipaddr='10.1.1.254'  # 设置 lan 接口的 IP 地址为 10.1.1.254
+uci set network.lan.ipaddr='192.168.99.1'  # 设置 lan 接口的 IP 地址为 10.1.1.254
 uci set network.lan.netmask='255.255.255.0'  # 设置 lan 接口的子网掩码为 255.255.255.0
 uci commit network
 
