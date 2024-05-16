@@ -117,10 +117,10 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxmindd
 
 
 # 修改默认登录地址
-sed -i 's/192.168.1.1/10.1.1.254/g' ./package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.99.1/g' ./package/base-files/files/bin/config_generate
 
 #2. 修改默认登录密码
-sed -i 's/$1$V4UetPzk$CYXluq4wUazHjmCDBCqXF.//g' ./package/lean/default-settings/files/zzz-default-settings
+sed -i 's/$1$eRZDGn.w$lAHe0nuYvaem61CpArhxV.//g' ./package/lean/default-settings/files/zzz-default-settings
 
 # 修改内核版本
 #sed -i 's/KERNEL_PATCHVER:=6.1/KERNEL_PATCHVER:=5.15/g' ./target/linux/x86/Makefile
