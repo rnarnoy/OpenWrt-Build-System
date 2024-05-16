@@ -89,10 +89,10 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages lua-maxmindd
 
 ##########################################其他设置##########################################
 # 修改默认登录地址
-# sed -i 's/192.168.1.1/10.1.1.254/g' ./package/base-files/files/bin/config_generate
+sed -i 's/192.168.1.1/192.168.99.1/g' ./package/base-files/files/bin/config_generate
 
 # 修改默认登录密码
-sed -i 's/$1$5mjCdAB1$Uk1sNbwoqfHxUmzRIeuZK1//g' ./package/base-files/files/etc/shadow
+sed -i 's/$1$eRZDGn.w$lAHe0nuYvaem61CpArhxV.//g' ./package/base-files/files/etc/shadow
 
 # 更换插件名称
 sed -i 's/("iStore"),/("应用中心"),/g' feeds/store/luci/luci-app-store/luasrc/controller/store.lua
