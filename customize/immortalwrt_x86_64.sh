@@ -19,57 +19,61 @@ function git_sparse_clone() {
 
 # 移除冲突包
 rm -rf feeds/packages/net/mosdns
-#rm -rf feeds/packages/net/msd_lite
-#rm -rf feeds/packages/net/smartdns
-#rm -rf feeds/luci/themes/luci-theme-argon
-#rm -rf feeds/small8/shadowsocks-rust
+# rm -rf feeds/packages/net/msd_lite
+# rm -rf feeds/packages/net/smartdns
+# rm -rf feeds/luci/themes/luci-theme-argon
+# rm -rf feeds/small8/shadowsocks-rust
 
-#luci-theme-argone
-#git_sparse_clone main https://github.com/kenzok8/small-package luci-theme-argone
-#git_sparse_clone main https://github.com/kenzok8/small-package luci-app-argone-config
+# luci-theme-argone
+# git_sparse_clone main https://github.com/kenzok8/small-package luci-theme-argone
+# git_sparse_clone main https://github.com/kenzok8/small-package luci-app-argone-config
 
 #luci-app-store
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-store
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-store
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-lib-taskd
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-lib-xterm
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages taskd
-#更换插件名称
-sed -i 's/("iStore"),/("应用中心"),/g' package/linpc/luci-app-store/luasrc/controller/store.lua
 
-#adguardhome
-git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-adguardhome
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages adguardhome
+# 更换插件名称
+# sed -i 's/("iStore"),/("应用中心"),/g' package/linpc/luci-app-store/luasrc/controller/store.lua
 
-#科学上网
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-openclash
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-passwall
+# adguardhome
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-adguardhome
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages adguardhome
+
+# 科学上网
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-openclash
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-passwall
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ssr-plus
-#更换插件名称
-#sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
 
-#ddns-go
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages ddns-go
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddns-go
+# 更换插件名称
+# sed -i 's/ShadowSocksR Plus+/科学上网/g' feeds/small8/luci-app-ssr-plus/luasrc/controller/shadowsocksr.lua
+
+# ddns-go
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages ddns-go
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-ddns-go
 # rm -rf feeds/small8/ddns-go feeds/small8/luci-app-ddns-go
 # git clone --depth=1 https://github.com/sirpdboy/luci-app-ddns-go package/ddnsgo
 
-#Netdata
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
-#git clone --depth=1 https://github.com/Jason6111/luci-app-netdata package/linpc/luci-app-netdata
-# 调整 netdata 到 服务 菜单
-#sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/controller/*.lua
-#sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/model/cgi/*.lua
-#sed -i 's/admin\/system/admin\/services/g' feeds/luci/applications/luci-app-netdata/luasrc/view/netdata/*.htm
+# Netdata
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages netdata
+# git clone --depth=1 https://github.com/Jason6111/luci-app-netdata package/linpc/luci-app-netdata
 
-#mosdns
+# 调整 netdata 到 服务 菜单
+# sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/controller/*.lua
+# sed -i 's/"system"/"services"/g' feeds/luci/applications/luci-app-netdata/luasrc/model/cgi/*.lua
+# sed -i 's/admin\/system/admin\/services/g' feeds/luci/applications/luci-app-netdata/luasrc/view/netdata/*.htm
+
+# mosdns
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages mosdns
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-mosdns
+
 # 修复插件冲突
-#rm -rf feeds/small8/luci-app-mosdns/root/etc/init.d
+# rm -rf feeds/small8/luci-app-mosdns/root/etc/init.d
 
 #zerotier
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages zerotier
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-zerotier
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages zerotier
 
 #luci-app-autotimeset
 git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-autotimeset
@@ -85,7 +89,7 @@ git_sparse_clone master https://github.com/kiddin9/openwrt-packages luci-app-aut
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages ipt2socks
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages microsocks
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages naiveproxy
-#git_sparse_clone master https://github.com/kiddin9/openwrt-packages pdnsd-alt
+# git_sparse_clone master https://github.com/kiddin9/openwrt-packages pdnsd-alt
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages shadowsocksr-libev
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages shadowsocks-rust
 # git_sparse_clone master https://github.com/kiddin9/openwrt-packages simple-obfs
